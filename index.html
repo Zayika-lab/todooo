@@ -1,0 +1,198 @@
+
+<style>
+*{box-sizing:border-box;margin:0}
+.tl-bar-bg{background:var(--color-background-tertiary);height:12px;border-radius:6px;overflow:hidden}
+.tl-bar-fill{height:100%;border-radius:6px;transition:width .3s}
+.tl-ok{background:#1D9E75}.tl-warn{background:#EF9F27}.tl-over{background:#E24B4A}
+.grp{margin-bottom:1.5rem}
+.grp-header{font-size:14px;font-weight:500;color:var(--color-text-secondary);padding:8px 0;border-bottom:1.5px solid var(--color-border-secondary);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.grp-now .grp-header{color:#1D9E75;border-color:#1D9E75}
+.task{display:flex;gap:10px;align-items:flex-start;padding:10px 8px;border-bottom:0.5px solid var(--color-border-tertiary);cursor:grab;transition:opacity .2s,background .15s;border-radius:var(--border-radius-md)}
+.task:active{cursor:grabbing}
+.task.dragging{opacity:.3}
+.task.drag-over{background:var(--color-background-info)}
+.task.done-row{opacity:.4}
+.badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);border:0.5px solid;white-space:nowrap}
+.edit-btn{background:none;border:none;color:var(--color-text-tertiary);cursor:pointer;font-size:13px;padding:2px 6px}
+.edit-btn:hover{color:var(--color-text-primary)}
+.del-btn{background:none;border:none;color:var(--color-text-tertiary);cursor:pointer;font-size:16px;padding:2px 6px}
+.editable{border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:4px 8px;font-size:13px;width:100%;font-family:var(--font-sans);background:var(--color-background-primary);color:var(--color-text-primary)}
+.dur-input{width:55px;font-size:13px;padding:2px 6px;text-align:center}
+.drop-zone{min-height:40px;border:2px dashed var(--color-border-tertiary);border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--color-text-tertiary);transition:border-color .2s,background .2s}
+.drop-zone.drag-hover{border-color:#1D9E75;background:rgba(29,158,117,0.07)}
+</style>
+
+<div style="padding:1rem 0;max-width:640px">
+<div style="margin-bottom:1.5rem;padding:1rem 1.25rem;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg)">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+    <label style="font-size:14px;color:var(--color-text-secondary)">Дедлайн:</label>
+    <input type="datetime-local" id="deadline" style="font-size:14px;padding:4px 8px"/>
+    <button onclick="setDeadline()">Встановити</button>
+  </div>
+  <div id="timeInfo" style="font-size:13px;color:var(--color-text-secondary);margin-bottom:8px"></div>
+  <div class="tl-bar-bg"><div class="tl-bar-fill" id="tlFill"></div></div>
+  <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--color-text-tertiary);margin-top:4px">
+    <span>Зараз</span><span id="dlLabel">Не встановлено</span>
+  </div>
+</div>
+
+<div id="app"></div>
+
+<div style="margin-top:1.5rem;display:flex;gap:8px">
+  <input type="text" id="newTask" placeholder="Нове завдання…" style="flex:1"/>
+  <button onclick="addTask()">+ Додати</button>
+</div>
+<div id="stats" style="margin-top:1rem;font-size:13px;color:var(--color-text-secondary)"></div>
+</div>
+
+<script>
+let T=[
+{id:1,done:false,prio:"ТЕРМІНОВО",pc:"red",title:"Оплатити рахунки",note:"Зараз. Відкрий банкінг і заплати все одразу.",mins:30,now:true},
+{id:2,done:false,prio:"ТЕРМІНОВО",pc:"red",title:"Страхова: аварія",note:"Зателефонуй/напиши. Підготуй: фото, дату, номер справи.",mins:30,now:true},
+{id:3,done:false,prio:"ТЕРМІНОВО",pc:"red",title:"Робота: розібратися що горить",note:"15 хв переглянути пошту/таски.",mins:15,now:true},
+{id:4,done:false,prio:"ВАЖЛИВО",pc:"amber",title:"Страхова: оскаржити рахунок",note:"Написати заперечення. Перевір строки.",mins:45,now:false},
+{id:5,done:false,prio:"ВАЖЛИВО",pc:"amber",title:"Навести лад вдома",note:"Один простір за раз. Таймер 25 хв.",mins:60,now:false},
+{id:6,done:false,prio:"СЕРЕДНЄ",pc:"teal",title:"Розібрати папери",note:"Три купки: зроблено / треба / сміття.",mins:30,now:false},
+{id:7,done:false,prio:"СЕРЕДНЄ",pc:"teal",title:"Перевірити забуті дедлайни",note:"Пошта за 4 тижні.",mins:20,now:false},
+{id:8,done:false,prio:"НИЗЬКИЙ",pc:"gray",title:"Закупи / прибирання / прання",note:"Доповни що потрібно.",mins:0,now:false}
+];
+let nid=100,dlMs=null,dragId=null,editId=null;
+
+const C={
+red:{bg:"#FCEBEB",bd:"#A32D2D",tx:"#791F1F",dbg:"#501313",dbd:"#F09595",dtx:"#F7C1C1"},
+amber:{bg:"#FAEEDA",bd:"#854F0B",tx:"#633806",dbg:"#412402",dbd:"#EF9F27",dtx:"#FAC775"},
+teal:{bg:"#E1F5EE",bd:"#0F6E56",tx:"#085041",dbg:"#04342C",dbd:"#5DCAA5",dtx:"#9FE1CB"},
+gray:{bg:"#F1EFE8",bd:"#5F5E5A",tx:"#444441",dbg:"#2C2C2A",dbd:"#B4B2A9",dtx:"#D3D1C7"}
+};
+const dk=window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;
+function gc(c){const v=C[c];return dk?{bg:v.dbg,bd:v.dbd,tx:v.dtx}:{bg:v.bg,bd:v.bd,tx:v.tx}}
+function fm(m){if(!m)return"0 хв";if(m<60)return m+" хв";const h=Math.floor(m/60),r=m%60;return r?h+" год "+r+" хв":h+" год"}
+
+function setDeadline(){const v=document.getElementById("deadline").value;if(!v)return;dlMs=new Date(v).getTime();upTL()}
+
+function upTL(){
+const fill=document.getElementById("tlFill"),info=document.getElementById("timeInfo"),lb=document.getElementById("dlLabel");
+const tot=T.filter(t=>!t.done).reduce((s,t)=>s+(t.mins||0),0);
+if(!dlMs){fill.style.width="0%";fill.className="tl-bar-fill";info.textContent="Завдань: ~"+fm(tot);lb.textContent="Не встановлено";return}
+const avail=Math.max(0,Math.round((dlMs-Date.now())/60000));
+const pct=avail>0?Math.min(100,Math.round(tot/avail*100)):100;
+fill.style.width=pct+"%";fill.className="tl-bar-fill "+(pct<=60?"tl-ok":pct<=90?"tl-warn":"tl-over");
+lb.textContent=new Date(dlMs).toLocaleString("uk-UA",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+const fr=avail-tot;
+info.innerHTML="Доступно: <b>"+fm(avail)+"</b> · Завдання: <b>"+fm(tot)+"</b> · "+(fr>=0?"Запас: <b>"+fm(fr)+"</b>":"<span style='color:#E24B4A;font-weight:500'>Бракує "+fm(Math.abs(fr))+"</span>");
+}
+
+function taskHTML(t){
+const c=gc(t.pc);
+const isEdit=editId===t.id;
+if(isEdit){
+return `<div class="task" data-id="${t.id}" draggable="false" style="flex-direction:column;cursor:default">
+<div style="display:flex;gap:8px;width:100%;margin-bottom:6px">
+  <input class="editable" id="et" value="${esc(t.title)}" placeholder="Назва"/>
+</div>
+<textarea class="editable" id="en" rows="2" placeholder="Опис">${esc(t.note)}</textarea>
+<div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+  <input type="number" class="dur-input" id="em" value="${t.mins||0}" min="0" step="5"/>
+  <span style="font-size:12px;color:var(--color-text-tertiary)">хв</span>
+  <select id="ep" style="font-size:13px;padding:2px 6px">
+    <option value="red" ${t.pc==='red'?'selected':''}>Терміново</option>
+    <option value="amber" ${t.pc==='amber'?'selected':''}>Важливо</option>
+    <option value="teal" ${t.pc==='teal'?'selected':''}>Середнє</option>
+    <option value="gray" ${t.pc==='gray'?'selected':''}>Низький</option>
+  </select>
+  <button onclick="saveEdit(${t.id})" style="font-size:13px">Зберегти</button>
+  <button onclick="cancelEdit()" style="font-size:13px">Скасувати</button>
+</div></div>`;
+}
+return `<div class="task${t.done?' done-row':''}" data-id="${t.id}" draggable="true"
+  ondragstart="ds(event)" ondragend="de(event)" ondragover="dov(event)" ondrop="dp(event)">
+  <input type="checkbox" ${t.done?"checked":""} onchange="tog(${t.id})" style="margin-top:4px;width:18px;height:18px;cursor:pointer;accent-color:var(--color-text-info);flex-shrink:0"/>
+  <div style="flex:1;min-width:0">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span class="badge" style="background:${c.bg};color:${c.tx};border-color:${c.bd}">${t.prio}</span>
+      <span style="font-size:15px;font-weight:500;color:var(--color-text-primary);${t.done?'text-decoration:line-through':''}">${esc(t.title)}</span>
+    </div>
+    <p style="font-size:13px;color:var(--color-text-secondary);margin:4px 0 0;line-height:1.5">${esc(t.note)}</p>
+    <div style="margin-top:6px;display:flex;align-items:center;gap:6px">
+      <input type="number" class="dur-input" value="${t.mins||0}" min="0" step="5" onchange="setM(${t.id},this.value)"/>
+      <span style="font-size:12px;color:var(--color-text-tertiary)">хв</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0">
+    <button class="edit-btn" onclick="startEdit(${t.id})" title="Редагувати">&#9998;</button>
+    <button class="del-btn" onclick="rem(${t.id})" title="Видалити">&times;</button>
+  </div>
+</div>`;
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function render(){
+const app=document.getElementById("app");
+const nowT=T.filter(t=>t.now),restT=T.filter(t=>!t.now);
+let h=`<div class="grp grp-now"><div class="grp-header"><span style="font-size:18px">&#9889;</span> Зараз</div>`;
+if(nowT.length)h+=nowT.map(taskHTML).join("");
+h+=`<div class="drop-zone" data-zone="now" ondragover="dzov(event)" ondragleave="dzlv(event)" ondrop="dzdp(event,'now')">Перетягни сюди</div></div>`;
+h+=`<div class="grp"><div class="grp-header">Далі</div>`;
+if(restT.length)h+=restT.map(taskHTML).join("");
+h+=`<div class="drop-zone" data-zone="rest" ondragover="dzov(event)" ondragleave="dzlv(event)" ondrop="dzdp(event,'rest')">Перетягни сюди</div></div>`;
+app.innerHTML=h;
+const dn=T.filter(t=>t.done).length;
+document.getElementById("stats").textContent=dn+" з "+T.length+" зроблено";
+upTL();
+}
+
+function tog(id){const t=T.find(x=>x.id===id);if(t)t.done=!t.done;render()}
+function rem(id){const i=T.findIndex(x=>x.id===id);if(i>-1)T.splice(i,1);render()}
+function setM(id,v){const t=T.find(x=>x.id===id);if(t)t.mins=Math.max(0,parseInt(v)||0);upTL()}
+
+function startEdit(id){editId=id;render();document.getElementById("et")&&document.getElementById("et").focus()}
+function cancelEdit(){editId=null;render()}
+function saveEdit(id){
+const t=T.find(x=>x.id===id);if(!t)return;
+t.title=document.getElementById("et").value||t.title;
+t.note=document.getElementById("en").value;
+t.mins=Math.max(0,parseInt(document.getElementById("em").value)||0);
+const p=document.getElementById("ep").value;
+const pMap={red:"ТЕРМІНОВО",amber:"ВАЖЛИВО",teal:"СЕРЕДНЄ",gray:"НИЗЬКИЙ"};
+t.pc=p;t.prio=pMap[p]||t.prio;
+editId=null;render();
+}
+
+function ds(e){dragId=+e.currentTarget.dataset.id;e.currentTarget.classList.add("dragging");e.dataTransfer.effectAllowed="move"}
+function de(e){e.currentTarget.classList.remove("dragging");dragId=null}
+function dov(e){e.preventDefault();e.dataTransfer.dropEffect="move";const row=e.currentTarget;if(+row.dataset.id!==dragId)row.classList.add("drag-over")}
+function dp(e){
+e.preventDefault();e.currentTarget.classList.remove("drag-over");
+const targetId=+e.currentTarget.dataset.id;if(!dragId||dragId===targetId)return;
+const fi=T.findIndex(x=>x.id===dragId),ti=T.findIndex(x=>x.id===targetId);
+if(fi<0||ti<0)return;
+const targetNow=T[ti].now;
+const item=T.splice(fi,1)[0];
+item.now=targetNow;
+const ni=T.findIndex(x=>x.id===targetId);
+T.splice(ni,0,item);
+dragId=null;render();
+}
+
+function dzov(e){e.preventDefault();e.dataTransfer.dropEffect="move";e.currentTarget.classList.add("drag-hover")}
+function dzlv(e){e.currentTarget.classList.remove("drag-hover")}
+function dzdp(e,zone){
+e.preventDefault();e.currentTarget.classList.remove("drag-hover");
+if(!dragId)return;
+const fi=T.findIndex(x=>x.id===dragId);if(fi<0)return;
+const item=T.splice(fi,1)[0];
+item.now=zone==="now";
+if(zone==="now"){const lastNow=T.filter(x=>x.now).length;T.splice(lastNow,0,item)}
+else{T.push(item)}
+dragId=null;render();
+}
+
+function addTask(){
+const inp=document.getElementById("newTask"),v=inp.value.trim();if(!v)return;
+T.push({id:nid++,done:false,prio:"НОВЕ",pc:"gray",title:v,note:"",mins:0,now:false});
+inp.value="";render();
+}
+document.getElementById("newTask").addEventListener("keydown",e=>{if(e.key==="Enter")addTask()});
+render();
+</script>
