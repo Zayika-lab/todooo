@@ -44,40 +44,70 @@ input[type=text],input[type=number],input[type=datetime-local],textarea,select{b
 .dur-input{width:55px;font-size:13px;padding:2px 6px;text-align:center}
 .drop-zone{min-height:40px;border:2px dashed var(--color-border-tertiary);border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--color-text-tertiary);transition:border-color .2s,background .2s}
 .drop-zone.drag-hover{border-color:#1D9E75;background:rgba(29,158,117,0.07)}
-#syncStatus{font-size:12px;padding:4px 10px;border-radius:var(--border-radius-md);display:inline-block;margin-bottom:8px}
+#syncStatus{font-size:12px;padding:4px 10px;border-radius:var(--border-radius-md);display:inline-block}
 .sync-ok{color:#1D9E75}.sync-err{color:#E24B4A}.sync-load{color:#EF9F27}
+#loginScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:20px;text-align:center}
+#loginScreen h1{font-size:28px;font-weight:700}
+#loginScreen p{color:var(--color-text-secondary);font-size:15px}
+#googleBtn{display:flex;align-items:center;gap:10px;padding:10px 24px;font-size:16px;font-weight:500;border:2px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);cursor:pointer;background:var(--color-background-primary);color:var(--color-text-primary);transition:box-shadow .2s}
+#googleBtn:hover{box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+#userBar{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:13px;color:var(--color-text-secondary)}
+#userBar img{width:28px;height:28px;border-radius:50%}
+#logoutBtn{font-size:12px;padding:3px 10px;color:var(--color-text-tertiary);border-color:var(--color-border-tertiary)}
 </style>
 </head>
 <body>
 
 <div style="padding:1rem 0;max-width:640px;width:100%">
-<div id="syncStatus" class="sync-load">🔄 Завантаження...</div>
 
-<div style="margin-bottom:1.5rem;padding:1rem 1.25rem;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg)">
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
-    <label style="font-size:14px;color:var(--color-text-secondary)">Дедлайн:</label>
-    <input type="datetime-local" id="deadline" style="font-size:14px;padding:4px 8px"/>
-    <button onclick="setDeadline()">Встановити</button>
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <h1>📋 Todooo</h1>
+  <p>Увійди, щоб зберігати завдання в хмарі</p>
+  <button id="googleBtn" onclick="googleLogin()">
+    <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+    Увійти з Google
+  </button>
+</div>
+
+<!-- MAIN APP (hidden until login) -->
+<div id="mainApp" style="display:none">
+  <div id="userBar">
+    <img id="userPhoto" src="" alt=""/>
+    <span id="userName"></span>
+    <div style="flex:1"></div>
+    <span id="syncStatus" class="sync-load">🔄</span>
+    <button id="logoutBtn" onclick="logout()">Вийти</button>
   </div>
-  <div id="timeInfo" style="font-size:13px;color:var(--color-text-secondary);margin-bottom:8px"></div>
-  <div class="tl-bar-bg"><div class="tl-bar-fill" id="tlFill"></div></div>
-  <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--color-text-tertiary);margin-top:4px">
-    <span>Зараз</span><span id="dlLabel">Не встановлено</span>
+
+  <div style="margin-bottom:1.5rem;padding:1rem 1.25rem;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg)">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+      <label style="font-size:14px;color:var(--color-text-secondary)">Дедлайн:</label>
+      <input type="datetime-local" id="deadline" style="font-size:14px;padding:4px 8px"/>
+      <button onclick="setDeadline()">Встановити</button>
+    </div>
+    <div id="timeInfo" style="font-size:13px;color:var(--color-text-secondary);margin-bottom:8px"></div>
+    <div class="tl-bar-bg"><div class="tl-bar-fill" id="tlFill"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--color-text-tertiary);margin-top:4px">
+      <span>Зараз</span><span id="dlLabel">Не встановлено</span>
+    </div>
   </div>
+
+  <div id="app"></div>
+
+  <div style="margin-top:1.5rem;display:flex;gap:8px">
+    <input type="text" id="newTask" placeholder="Нове завдання…" style="flex:1"/>
+    <button onclick="addTask()">+ Додати</button>
+  </div>
+  <div id="stats" style="margin-top:1rem;font-size:13px;color:var(--color-text-secondary)"></div>
 </div>
 
-<div id="app"></div>
-
-<div style="margin-top:1.5rem;display:flex;gap:8px">
-  <input type="text" id="newTask" placeholder="Нове завдання…" style="flex:1"/>
-  <button onclick="addTask()">+ Додати</button>
-</div>
-<div id="stats" style="margin-top:1rem;font-size:13px;color:var(--color-text-secondary)"></div>
 </div>
 
-<!-- Firebase SDK (compat version for simple <script> usage) -->
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
 <script>
 // === FIREBASE CONFIG ===
@@ -92,12 +122,41 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const DOC_REF = db.collection("userData").doc("main");
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
 
-// === STATE ===
+let DOC_REF = null;
 let T = [];
 let nid = 100, dlMs = null, dragId = null, editId = null;
 let saveTimer = null;
+
+// === AUTH ===
+function googleLogin() {
+  auth.signInWithPopup(provider).catch(err => {
+    console.error("Login error:", err);
+    alert("Login fehlgeschlagen: " + err.message);
+  });
+}
+
+function logout() {
+  auth.signOut();
+}
+
+auth.onAuthStateChanged(user => {
+  if (user) {
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("mainApp").style.display = "block";
+    document.getElementById("userName").textContent = user.displayName || user.email;
+    document.getElementById("userPhoto").src = user.photoURL || "";
+    DOC_REF = db.collection("users").doc(user.uid).collection("data").doc("tasks");
+    loadFromCloud();
+  } else {
+    document.getElementById("loginScreen").style.display = "flex";
+    document.getElementById("mainApp").style.display = "none";
+    DOC_REF = null;
+    T = [];
+  }
+});
 
 // === SYNC STATUS ===
 function syncStatus(state, msg) {
@@ -108,6 +167,7 @@ function syncStatus(state, msg) {
 
 // === SAVE TO FIREBASE (debounced) ===
 function saveToCloud() {
+  if (!DOC_REF) return;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     const data = { tasks: T, deadline: dlMs, nextId: nid };
@@ -115,13 +175,15 @@ function saveToCloud() {
       syncStatus("ok", "☁️ Збережено");
     }).catch(err => {
       console.error("Save error:", err);
-      syncStatus("err", "⚠️ Помилка збереження");
+      syncStatus("err", "⚠️ Помилка");
     });
   }, 500);
 }
 
 // === LOAD FROM FIREBASE ===
 async function loadFromCloud() {
+  if (!DOC_REF) return;
+  syncStatus("load", "🔄");
   try {
     const snap = await DOC_REF.get();
     if (snap.exists) {
@@ -136,24 +198,15 @@ async function loadFromCloud() {
           d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
       }
     } else {
-      // First time: save default tasks
-      T = [
-        {id:1,done:false,prio:"ТЕРМІНОВО",pc:"red",title:"Оплатити рахунки",note:"Зараз. Відкрий банкінг і заплати все одразу.",mins:30,now:true},
-        {id:2,done:false,prio:"ТЕРМІНОВО",pc:"red",title:"Страхова: аварія",note:"Зателефонуй/напиши. Підготуй: фото, дату, номер справи.",mins:30,now:true},
-        {id:3,done:false,prio:"ТЕРМІНОВО",pc:"red",title:"Робота: розібратися що горить",note:"15 хв переглянути пошту/таски.",mins:15,now:true},
-        {id:4,done:false,prio:"ВАЖЛИВО",pc:"amber",title:"Страхова: оскаржити рахунок",note:"Написати заперечення. Перевір строки.",mins:45,now:false},
-        {id:5,done:false,prio:"ВАЖЛИВО",pc:"amber",title:"Навести лад вдома",note:"Один простір за раз. Таймер 25 хв.",mins:60,now:false},
-        {id:6,done:false,prio:"СЕРЕДНЄ",pc:"teal",title:"Розібрати папери",note:"Три купки: зроблено / треба / сміття.",mins:30,now:false},
-        {id:7,done:false,prio:"СЕРЕДНЄ",pc:"teal",title:"Перевірити забуті дедлайни",note:"Пошта за 4 тижні.",mins:20,now:false},
-        {id:8,done:false,prio:"НИЗЬКИЙ",pc:"gray",title:"Закупи / прибирання / прання",note:"Доповни що потрібно.",mins:0,now:false}
-      ];
-      saveToCloud();
+      T = [];
+      nid = 100;
+      dlMs = null;
     }
     syncStatus("ok", "☁️ Збережено");
     render();
   } catch (err) {
     console.error("Load error:", err);
-    syncStatus("err", "⚠️ Помилка завантаження");
+    syncStatus("err", "⚠️ Помилка");
     render();
   }
 }
@@ -230,6 +283,7 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 
 function render(){
 const app=document.getElementById("app");
+if(!app)return;
 const nowT=T.filter(t=>t.now),restT=T.filter(t=>!t.now);
 let h=`<div class="grp grp-now"><div class="grp-header"><span style="font-size:18px">&#9889;</span> Зараз</div>`;
 if(nowT.length)h+=nowT.map(taskHTML).join("");
@@ -295,9 +349,6 @@ T.push({id:nid++,done:false,prio:"НОВЕ",pc:"gray",title:v,note:"",mins:0,now
 inp.value="";render();saveToCloud();
 }
 document.getElementById("newTask").addEventListener("keydown",e=>{if(e.key==="Enter")addTask()});
-
-// === START ===
-loadFromCloud();
 </script>
 </body>
 </html>
