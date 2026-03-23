@@ -1,6 +1,30 @@
-
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Todooo – Планувальник завдань</title>
 <style>
+:root{
+  --color-background-primary:#fff;--color-background-tertiary:#f0f0f0;
+  --color-border-secondary:#ddd;--color-border-tertiary:#eee;
+  --color-text-primary:#1a1a1a;--color-text-secondary:#666;--color-text-tertiary:#999;
+  --color-background-info:#e8f4fd;--color-text-info:#1D9E75;
+  --border-radius-md:6px;--border-radius-lg:12px;--font-sans:system-ui,-apple-system,sans-serif;
+}
+@media(prefers-color-scheme:dark){
+:root{
+  --color-background-primary:#1a1a1a;--color-background-tertiary:#2a2a2a;
+  --color-border-secondary:#444;--color-border-tertiary:#333;
+  --color-text-primary:#e8e8e8;--color-text-secondary:#aaa;--color-text-tertiary:#777;
+  --color-background-info:#1a2a3a;--color-text-info:#5DCAA5;
+}}
 *{box-sizing:border-box;margin:0}
+body{font-family:var(--font-sans);background:var(--color-background-tertiary);color:var(--color-text-primary);padding:1rem;display:flex;justify-content:center}
+input,button,select,textarea{font-family:var(--font-sans)}
+button{cursor:pointer;padding:6px 14px;border:1px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-size:14px}
+button:hover{opacity:.8}
+input[type=text],input[type=number],input[type=datetime-local],textarea,select{border:1px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:6px 10px;background:var(--color-background-primary);color:var(--color-text-primary);font-size:14px}
 .tl-bar-bg{background:var(--color-background-tertiary);height:12px;border-radius:6px;overflow:hidden}
 .tl-bar-fill{height:100%;border-radius:6px;transition:width .3s}
 .tl-ok{background:#1D9E75}.tl-warn{background:#EF9F27}.tl-over{background:#E24B4A}
@@ -20,9 +44,15 @@
 .dur-input{width:55px;font-size:13px;padding:2px 6px;text-align:center}
 .drop-zone{min-height:40px;border:2px dashed var(--color-border-tertiary);border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--color-text-tertiary);transition:border-color .2s,background .2s}
 .drop-zone.drag-hover{border-color:#1D9E75;background:rgba(29,158,117,0.07)}
+#syncStatus{font-size:12px;padding:4px 10px;border-radius:var(--border-radius-md);display:inline-block;margin-bottom:8px}
+.sync-ok{color:#1D9E75}.sync-err{color:#E24B4A}.sync-load{color:#EF9F27}
 </style>
+</head>
+<body>
 
-<div style="padding:1rem 0;max-width:640px">
+<div style="padding:1rem 0;max-width:640px;width:100%">
+<div id="syncStatus" class="sync-load">🔄 Завантаження...</div>
+
 <div style="margin-bottom:1.5rem;padding:1rem 1.25rem;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg)">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
     <label style="font-size:14px;color:var(--color-text-secondary)">Дедлайн:</label>
@@ -45,19 +75,90 @@
 <div id="stats" style="margin-top:1rem;font-size:13px;color:var(--color-text-secondary)"></div>
 </div>
 
-<script>
-let T=[
-{id:1,done:false,prio:"ТЕРМІНОВО",pc:"red",title:"Оплатити рахунки",note:"Зараз. Відкрий банкінг і заплати все одразу.",mins:30,now:true},
-{id:2,done:false,prio:"ТЕРМІНОВО",pc:"red",title:"Страхова: аварія",note:"Зателефонуй/напиши. Підготуй: фото, дату, номер справи.",mins:30,now:true},
-{id:3,done:false,prio:"ТЕРМІНОВО",pc:"red",title:"Робота: розібратися що горить",note:"15 хв переглянути пошту/таски.",mins:15,now:true},
-{id:4,done:false,prio:"ВАЖЛИВО",pc:"amber",title:"Страхова: оскаржити рахунок",note:"Написати заперечення. Перевір строки.",mins:45,now:false},
-{id:5,done:false,prio:"ВАЖЛИВО",pc:"amber",title:"Навести лад вдома",note:"Один простір за раз. Таймер 25 хв.",mins:60,now:false},
-{id:6,done:false,prio:"СЕРЕДНЄ",pc:"teal",title:"Розібрати папери",note:"Три купки: зроблено / треба / сміття.",mins:30,now:false},
-{id:7,done:false,prio:"СЕРЕДНЄ",pc:"teal",title:"Перевірити забуті дедлайни",note:"Пошта за 4 тижні.",mins:20,now:false},
-{id:8,done:false,prio:"НИЗЬКИЙ",pc:"gray",title:"Закупи / прибирання / прання",note:"Доповни що потрібно.",mins:0,now:false}
-];
-let nid=100,dlMs=null,dragId=null,editId=null;
+<!-- Firebase SDK (compat version for simple <script> usage) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
+<script>
+// === FIREBASE CONFIG ===
+const firebaseConfig = {
+  apiKey: "AIzaSyDYR5F3tPBCQgFlftpGa7DnvIHb2pXZ4_Y",
+  authDomain: "todooo-e2420.firebaseapp.com",
+  projectId: "todooo-e2420",
+  storageBucket: "todooo-e2420.firebasestorage.app",
+  messagingSenderId: "644820241408",
+  appId: "1:644820241408:web:d16cdd7b73e75833109ce5"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const DOC_REF = db.collection("userData").doc("main");
+
+// === STATE ===
+let T = [];
+let nid = 100, dlMs = null, dragId = null, editId = null;
+let saveTimer = null;
+
+// === SYNC STATUS ===
+function syncStatus(state, msg) {
+  const el = document.getElementById("syncStatus");
+  el.textContent = msg;
+  el.className = "sync-" + state;
+}
+
+// === SAVE TO FIREBASE (debounced) ===
+function saveToCloud() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const data = { tasks: T, deadline: dlMs, nextId: nid };
+    DOC_REF.set(data).then(() => {
+      syncStatus("ok", "☁️ Збережено");
+    }).catch(err => {
+      console.error("Save error:", err);
+      syncStatus("err", "⚠️ Помилка збереження");
+    });
+  }, 500);
+}
+
+// === LOAD FROM FIREBASE ===
+async function loadFromCloud() {
+  try {
+    const snap = await DOC_REF.get();
+    if (snap.exists) {
+      const data = snap.data();
+      T = data.tasks || [];
+      dlMs = data.deadline || null;
+      nid = data.nextId || 100;
+      if (dlMs) {
+        const d = new Date(dlMs);
+        const pad = n => String(n).padStart(2,'0');
+        document.getElementById("deadline").value =
+          d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+      }
+    } else {
+      // First time: save default tasks
+      T = [
+        {id:1,done:false,prio:"ТЕРМІНОВО",pc:"red",title:"Оплатити рахунки",note:"Зараз. Відкрий банкінг і заплати все одразу.",mins:30,now:true},
+        {id:2,done:false,prio:"ТЕРМІНОВО",pc:"red",title:"Страхова: аварія",note:"Зателефонуй/напиши. Підготуй: фото, дату, номер справи.",mins:30,now:true},
+        {id:3,done:false,prio:"ТЕРМІНОВО",pc:"red",title:"Робота: розібратися що горить",note:"15 хв переглянути пошту/таски.",mins:15,now:true},
+        {id:4,done:false,prio:"ВАЖЛИВО",pc:"amber",title:"Страхова: оскаржити рахунок",note:"Написати заперечення. Перевір строки.",mins:45,now:false},
+        {id:5,done:false,prio:"ВАЖЛИВО",pc:"amber",title:"Навести лад вдома",note:"Один простір за раз. Таймер 25 хв.",mins:60,now:false},
+        {id:6,done:false,prio:"СЕРЕДНЄ",pc:"teal",title:"Розібрати папери",note:"Три купки: зроблено / треба / сміття.",mins:30,now:false},
+        {id:7,done:false,prio:"СЕРЕДНЄ",pc:"teal",title:"Перевірити забуті дедлайни",note:"Пошта за 4 тижні.",mins:20,now:false},
+        {id:8,done:false,prio:"НИЗЬКИЙ",pc:"gray",title:"Закупи / прибирання / прання",note:"Доповни що потрібно.",mins:0,now:false}
+      ];
+      saveToCloud();
+    }
+    syncStatus("ok", "☁️ Збережено");
+    render();
+  } catch (err) {
+    console.error("Load error:", err);
+    syncStatus("err", "⚠️ Помилка завантаження");
+    render();
+  }
+}
+
+// === COLORS ===
 const C={
 red:{bg:"#FCEBEB",bd:"#A32D2D",tx:"#791F1F",dbg:"#501313",dbd:"#F09595",dtx:"#F7C1C1"},
 amber:{bg:"#FAEEDA",bd:"#854F0B",tx:"#633806",dbg:"#412402",dbd:"#EF9F27",dtx:"#FAC775"},
@@ -68,7 +169,7 @@ const dk=window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').mat
 function gc(c){const v=C[c];return dk?{bg:v.dbg,bd:v.dbd,tx:v.dtx}:{bg:v.bg,bd:v.bd,tx:v.tx}}
 function fm(m){if(!m)return"0 хв";if(m<60)return m+" хв";const h=Math.floor(m/60),r=m%60;return r?h+" год "+r+" хв":h+" год"}
 
-function setDeadline(){const v=document.getElementById("deadline").value;if(!v)return;dlMs=new Date(v).getTime();upTL()}
+function setDeadline(){const v=document.getElementById("deadline").value;if(!v)return;dlMs=new Date(v).getTime();upTL();saveToCloud()}
 
 function upTL(){
 const fill=document.getElementById("tlFill"),info=document.getElementById("timeInfo"),lb=document.getElementById("dlLabel");
@@ -91,7 +192,7 @@ return `<div class="task" data-id="${t.id}" draggable="false" style="flex-direct
   <input class="editable" id="et" value="${esc(t.title)}" placeholder="Назва"/>
 </div>
 <textarea class="editable" id="en" rows="2" placeholder="Опис">${esc(t.note)}</textarea>
-<div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+<div style="display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap">
   <input type="number" class="dur-input" id="em" value="${t.mins||0}" min="0" step="5"/>
   <span style="font-size:12px;color:var(--color-text-tertiary)">хв</span>
   <select id="ep" style="font-size:13px;padding:2px 6px">
@@ -142,9 +243,9 @@ document.getElementById("stats").textContent=dn+" з "+T.length+" зроблен
 upTL();
 }
 
-function tog(id){const t=T.find(x=>x.id===id);if(t)t.done=!t.done;render()}
-function rem(id){const i=T.findIndex(x=>x.id===id);if(i>-1)T.splice(i,1);render()}
-function setM(id,v){const t=T.find(x=>x.id===id);if(t)t.mins=Math.max(0,parseInt(v)||0);upTL()}
+function tog(id){const t=T.find(x=>x.id===id);if(t)t.done=!t.done;render();saveToCloud()}
+function rem(id){const i=T.findIndex(x=>x.id===id);if(i>-1)T.splice(i,1);render();saveToCloud()}
+function setM(id,v){const t=T.find(x=>x.id===id);if(t)t.mins=Math.max(0,parseInt(v)||0);upTL();saveToCloud()}
 
 function startEdit(id){editId=id;render();document.getElementById("et")&&document.getElementById("et").focus()}
 function cancelEdit(){editId=null;render()}
@@ -156,7 +257,7 @@ t.mins=Math.max(0,parseInt(document.getElementById("em").value)||0);
 const p=document.getElementById("ep").value;
 const pMap={red:"ТЕРМІНОВО",amber:"ВАЖЛИВО",teal:"СЕРЕДНЄ",gray:"НИЗЬКИЙ"};
 t.pc=p;t.prio=pMap[p]||t.prio;
-editId=null;render();
+editId=null;render();saveToCloud();
 }
 
 function ds(e){dragId=+e.currentTarget.dataset.id;e.currentTarget.classList.add("dragging");e.dataTransfer.effectAllowed="move"}
@@ -172,7 +273,7 @@ const item=T.splice(fi,1)[0];
 item.now=targetNow;
 const ni=T.findIndex(x=>x.id===targetId);
 T.splice(ni,0,item);
-dragId=null;render();
+dragId=null;render();saveToCloud();
 }
 
 function dzov(e){e.preventDefault();e.dataTransfer.dropEffect="move";e.currentTarget.classList.add("drag-hover")}
@@ -185,14 +286,18 @@ const item=T.splice(fi,1)[0];
 item.now=zone==="now";
 if(zone==="now"){const lastNow=T.filter(x=>x.now).length;T.splice(lastNow,0,item)}
 else{T.push(item)}
-dragId=null;render();
+dragId=null;render();saveToCloud();
 }
 
 function addTask(){
 const inp=document.getElementById("newTask"),v=inp.value.trim();if(!v)return;
 T.push({id:nid++,done:false,prio:"НОВЕ",pc:"gray",title:v,note:"",mins:0,now:false});
-inp.value="";render();
+inp.value="";render();saveToCloud();
 }
 document.getElementById("newTask").addEventListener("keydown",e=>{if(e.key==="Enter")addTask()});
-render();
+
+// === START ===
+loadFromCloud();
 </script>
+</body>
+</html>
