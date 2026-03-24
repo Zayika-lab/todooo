@@ -96,6 +96,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .task.done-task{opacity:.45}
 .task-cb{margin-top:3px;width:17px;height:17px;cursor:pointer;accent-color:var(--accent);flex-shrink:0}
 .task-left-btns{display:flex;flex-direction:column;gap:2px;flex-shrink:0;margin-top:1px}
+.task-top-btns{display:flex;flex-direction:row;gap:4px;margin-bottom:3px}
 .task-left-btn{padding:1px 5px;border-radius:4px;font-size:9px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;border:1px solid transparent;background:none;line-height:1.3}
 .task-left-btn.now-l{color:var(--accent)}
 .task-left-btn.now-l:hover,.task-left-btn.now-l.active{background:var(--accent-bg);border-color:var(--accent-bd)}
@@ -103,7 +104,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .task-left-btn.today-l:hover,.task-left-btn.today-l.active{background:rgba(239,159,39,0.08);border-color:rgba(239,159,39,0.25)}
 .task-main{flex:1;min-width:0}
 .task-title-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.task-title{font-size:14px;font-weight:500;width:100%;border:none;background:none;color:var(--tx0);font-family:var(--font);padding:1px 0;outline:none;cursor:text}
+.task-title{font-size:14px;font-weight:500;flex:1;min-width:0;border:none;background:none;color:var(--tx0);font-family:var(--font);padding:1px 0;outline:none;cursor:text;resize:none;overflow:hidden;line-height:1.4;display:block;word-wrap:break-word;overflow-wrap:break-word}
 .task-title:focus{background:var(--bg2);border-radius:4px;padding:1px 6px}
 .task-title.strike{text-decoration:line-through;color:var(--tx2)}
 .task-note{font-size:12px;width:100%;border:none;background:none;color:var(--tx1);font-family:var(--font);padding:1px 0;outline:none;resize:none;cursor:text;margin-top:2px;line-height:1.4}
@@ -300,6 +301,8 @@ const LANG={
     now:"зараз",
     today:"сьогодні",
     min:"хв",
+    hourShort:"год",
+    hourWithMin:"г",
     of:"з",
     doneLabel:"зроблено",
     forToday:"на сьогодні",
@@ -344,6 +347,8 @@ const LANG={
     now:"jetzt",
     today:"heute",
     min:"Min",
+    hourShort:"St.",
+    hourWithMin:"St.",
     of:"von",
     doneLabel:"erledigt",
     forToday:"für heute",
@@ -402,7 +407,19 @@ let tagsOpen=true;
 /* ─── AUTH ─── */
 const isEmbeddedBrowser=(function(){
   const ua=navigator.userAgent||navigator.vendor||'';
-  return /TelegramBot|Telegram|Tg\//i.test(ua)||/FBAN|FBAV|FB_IAB/i.test(ua)||/Instagram/i.test(ua)||/Line\//i.test(ua)||/MicroMessenger/i.test(ua)||(!/Chrome|Safari|Firefox|Edge/i.test(ua)&&/Mobile/i.test(ua));
+  // Telegram detection: user agent, Telegram WebView objects, URL params
+  const isTelegram=/TelegramBot|Telegram|Tg\//i.test(ua)||
+    typeof window.TelegramWebviewProxy!=='undefined'||
+    typeof window.Telegram!=='undefined'||
+    window.location.search.indexOf('tgWebApp')>=0||
+    window.location.hash.indexOf('tgWebApp')>=0;
+  const isFB=/FBAN|FBAV|FB_IAB/i.test(ua);
+  const isIG=/Instagram/i.test(ua);
+  const isLine=/Line\//i.test(ua);
+  const isWechat=/MicroMessenger/i.test(ua);
+  const isWebView=/wv\)|WebView/i.test(ua);
+  const unknownMobile=!/Chrome|Safari|Firefox|Edge|Opera/i.test(ua)&&/Mobile/i.test(ua);
+  return isTelegram||isFB||isIG||isLine||isWechat||isWebView||unknownMobile;
 })();
 
 auth.getRedirectResult().then(result=>{
@@ -416,7 +433,12 @@ function googleLogin(){
   if(isEmbeddedBrowser){showTgFallback();return}
   auth.signInWithPopup(provider).catch(e=>{
     console.warn("Popup failed, trying redirect:",e.code);
-    if(e.code==='auth/popup-blocked'||e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request')auth.signInWithRedirect(provider);
+    if(e.code==='auth/popup-blocked'||e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'){
+      auth.signInWithRedirect(provider).catch(()=>showTgFallback());
+    }
+    else if(e.code==='auth/operation-not-supported-in-this-environment'||e.code==='auth/unauthorized-domain'){
+      showTgFallback();
+    }
     else alert("Login помилка: "+e.message);
   });
 }
@@ -491,7 +513,7 @@ const C={
 };
 function gc(c){const v=C[c]||C.gray;return dk?{bg:v.dbg,bd:v.dbd,tx:v.dtx}:{bg:v.bg,bd:v.bd,tx:v.tx}}
 function getPrioMap(){return{red:t('prioUrgent'),amber:t('prioImportant'),teal:t('prioMedium'),gray:t('prioLow')}}
-function fm(m){if(!m)return"0 "+t('min');if(m<60)return m+" "+t('min');const h=Math.floor(m/60),r=m%60;return r?h+"г "+r+t('min'):h+" год"}
+function fm(m){if(!m)return"0 "+t('min');if(m<60)return m+" "+t('min');const h=Math.floor(m/60),r=m%60;return r?h+" "+t('hourWithMin')+" "+r+" "+t('min'):h+" "+t('hourShort')}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
 /* ─── DEADLINE ─── */
@@ -627,6 +649,14 @@ function addTag(name){
   if(S.tags.find(tg=>tg.name.toLowerCase()===name.toLowerCase()))return;
   S.tags.push({id:S.nextTagId++,name,order:S.tags.length});render();save();
 }
+function addTagAndAssign(name,taskId){
+  name=name.trim();if(!name)return;
+  let tg=S.tags.find(x=>x.name.toLowerCase()===name.toLowerCase());
+  if(!tg){tg={id:S.nextTagId++,name,order:S.tags.length};S.tags.push(tg)}
+  const tt=S.tasks.find(x=>x.id===taskId);
+  if(tt){if(!tt.tags)tt.tags=[];if(!tt.tags.includes(tg.id))tt.tags.push(tg.id)}
+  render();save();
+}
 function removeTag(tagId){
   if(!confirm(t('deleteTag')))return;
   S.tags=S.tags.filter(tg=>tg.id!==tagId);
@@ -742,19 +772,21 @@ function taskHTML(tt){
     ondragstart="onDragStart(event,${tt.id})" ondragend="onDragEnd(event)"
     ondragover="onTaskDragOver(event,${tt.id})" ondrop="onTaskDrop(event,${tt.id})">
     <input type="checkbox" class="task-cb" ${isDone?"checked":""} onchange="tog(${tt.id})"/>
-    ${!isDone?`<div class="task-left-btns">
-      <button class="task-left-btn now-l${tt.now?' active':''}" onclick="setNow(${tt.id})" title="${t('now')}">⚡${t('now')}</button>
-      <button class="task-left-btn today-l${tt.today?' active':''}" onclick="setToday(${tt.id})" title="${t('today')}">📅${t('today')}</button>
-    </div>`:''}
     <div class="task-main">
+      ${!isDone?`<div class="task-top-btns">
+        <button class="task-left-btn now-l${tt.now?' active':''}" onclick="setNow(${tt.id})" title="${t('now')}">⚡${t('now')}</button>
+        <button class="task-left-btn today-l${tt.today?' active':''}" onclick="setToday(${tt.id})" title="${t('today')}">📅${t('today')}</button>
+      </div>`:''}
       <div class="task-title-row">
         <div class="prio-badge-wrap">
           <span class="prio-badge" style="background:${c.bg};color:${c.tx};border-color:${c.bd}" onclick="event.stopPropagation();togglePrio(${tt.id})">${esc(prioLabel)}</span>
           <div class="prio-dropdown" id="prioDd_${tt.id}">${prioOpts}</div>
         </div>
         ${tt.today&&!tt.now?'<span style="font-size:10px;color:var(--warn);font-weight:600">📅 '+t('today')+'</span>':''}
-        <input type="text" class="task-title${isDone?' strike':''}" value="${esc(tt.title)}"
-          onchange="setTitle(${tt.id},this.value)" onfocus="this.select()"/>
+        <textarea class="task-title${isDone?' strike':''}" rows="1"
+          oninput="autoGrow(this)" onchange="setTitle(${tt.id},this.value)"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"
+          onfocus="this.select()">${esc(tt.title)}</textarea>
       </div>
       <textarea class="task-note" rows="1" placeholder="…"
         oninput="autoGrow(this)" onchange="setNote(${tt.id},this.value)"
@@ -768,7 +800,10 @@ function taskHTML(tt){
         </span>
         <span style="position:relative;display:inline-flex">
           <span class="folder-label" onclick="event.stopPropagation();toggleTagPopup(${tt.id})">${t('tagLabel')}+</span>
-          <div class="tag-add-popup" id="tagPop_${tt.id}">${tagPopOpts}${S.tags.length===0?'<div style="padding:6px 12px;font-size:11px;color:var(--tx3)">—</div>':''}</div>
+          <div class="tag-add-popup" id="tagPop_${tt.id}">${tagPopOpts}${S.tags.length===0?'<div style="padding:6px 12px;font-size:11px;color:var(--tx3)">—</div>':''}
+          <div style="border-top:1px solid var(--bd3);padding:4px 8px">
+            <input type="text" class="add-tag-input" style="width:100%;box-sizing:border-box" placeholder="${t('addTagPh')}" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter'){event.stopPropagation();addTagAndAssign(this.value,${tt.id});this.value=''}"/>
+          </div></div>
         </span>
         ${tagsHtml}
       </div>
@@ -885,6 +920,7 @@ function render(){
   
   upTL();
   document.querySelectorAll('.task-note').forEach(autoGrow);
+  document.querySelectorAll('.task-title').forEach(autoGrow);
 }
 
 function autoGrow(el){
