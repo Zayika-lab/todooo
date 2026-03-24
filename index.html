@@ -172,6 +172,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .drop-zone{min-height:32px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--tx3);transition:all .2s;margin:4px 10px;border-radius:var(--rad);border:2px dashed transparent}
 .drop-zone.drag-hover{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
 .done-section{border-top:1px solid var(--bd3)}
+.done-section.collapsed{display:none}
 .done-toggle{display:flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;color:var(--tx2);cursor:pointer;user-select:none;transition:all .15s}
 .done-toggle:hover{background:var(--bg2);color:var(--tx1)}
 .done-toggle svg{transition:transform .2s}
@@ -413,8 +414,8 @@ function cursorToEnd(el){if(!el)return;const len=el.value?el.value.length:0;el.s
 
 function toggleDoneOverview(){doneOverviewOpen=!doneOverviewOpen;document.getElementById('doneOverviewBtn').classList.toggle('active',doneOverviewOpen);renderDoneOverview()}
 function renderDoneOverview(){const panel=document.getElementById('doneOverviewPanel');if(!doneOverviewOpen){panel.classList.remove('open');return}panel.classList.add('open');const doneTasks=S.tasks.filter(tt=>tt.done).sort((a,b)=>(b.doneAt||0)-(a.doneAt||0));if(!doneTasks.length){panel.innerHTML='<div style="padding:14px;font-size:13px;color:var(--tx2);text-align:center">—</div>';return}
-const groups={};doneTasks.forEach(tt=>{const d=tt.doneAt?new Date(tt.doneAt):null;const key=d?d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'):'unknown';if(!groups[key])groups[key]=[];groups[key].push(tt)});
-let h='';for(const key of Object.keys(groups)){const label=key==='unknown'?'—':doneAgoText(groups[key][0].doneAt);h+='<div class="done-overview-day">'+label+'</div>';groups[key].forEach(tt=>{const c=gc(tt.pc);h+='<div class="done-overview-task"><span class="prio-badge" style="background:'+c.bg+';color:'+c.tx+';border-color:'+c.bd+';font-size:9px;padding:0 5px">'+esc(getPrioMap()[tt.pc]||'')+'</span><span style="text-decoration:line-through">'+esc(tt.title)+'</span></div>'})}
+const dayGroups={};doneTasks.forEach(tt=>{const d=tt.doneAt?new Date(tt.doneAt):null;const key=d?d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'):'unknown';if(!dayGroups[key])dayGroups[key]=[];dayGroups[key].push(tt)});
+let h='';for(const key of Object.keys(dayGroups)){const label=key==='unknown'?'—':doneAgoText(dayGroups[key][0].doneAt);h+='<div class="done-overview-day">'+label+'</div>';const folderGroups={};dayGroups[key].forEach(tt=>{const fid=tt.folderId||0;if(!folderGroups[fid])folderGroups[fid]=[];folderGroups[fid].push(tt)});const folderIds=Object.keys(folderGroups);for(const fid of folderIds){const folder=S.folders.find(f=>f.id===Number(fid));const fn=folder?esc(folder.name):'?';if(folderIds.length>1||true){h+='<div style="padding:3px 14px 2px;font-size:11px;color:var(--tx2);font-weight:600;display:flex;align-items:center;gap:5px"><span>📁 '+fn+'</span></div>'}folderGroups[fid].forEach(tt=>{const c=gc(tt.pc);h+='<div class="done-overview-task"><span class="prio-badge" style="background:'+c.bg+';color:'+c.tx+';border-color:'+c.bd+';font-size:9px;padding:0 5px">'+esc(getPrioMap()[tt.pc]||'')+'</span><span style="text-decoration:line-through">'+esc(tt.title)+'</span></div>'})}}
 panel.innerHTML=h}
 
 function refTaskHTML(tt,refClass){
@@ -465,8 +466,8 @@ fhtml+='<textarea class="folder-desc" rows="1" placeholder="'+t('folderDescPh')+
 fhtml+='<div class="folder-body'+(collapsed?' collapsed':'')+'" style="'+(collapsed?'':'max-height:9999px')+'">';
 if(fTasks.length)fhtml+=fTasks.map(tt=>taskHTML(tt,false)).join("");
 fhtml+='<div class="drop-zone" ondragover="onZoneDragOver(event)" ondragleave="onZoneDragLeave(event)" ondrop="onZoneDrop(event,'+folder.id+',\'rest\')">'+t('dragHere')+'</div>';
-fhtml+='<div class="add-task-row"><textarea class="add-task-input" id="addInp_'+folder.id+'" placeholder="'+t('newTaskPh')+'" rows="1" oninput="autoGrow(this)" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();addTaskInFolder('+folder.id+')}"></textarea><button class="add-task-btn" onclick="addTaskInFolder('+folder.id+')">+</button></div>';
 fhtml+='</div>';
+fhtml+='<div class="add-task-row"><textarea class="add-task-input" id="addInp_'+folder.id+'" placeholder="'+t('newTaskPh')+'" rows="1" oninput="autoGrow(this)" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();addTaskInFolder('+folder.id+')}"></textarea><button class="add-task-btn" onclick="addTaskInFolder('+folder.id+')">+</button></div>';
 if(doneTasks.length){fhtml+='<div class="done-section'+(collapsed?' collapsed':'')+'"><div class="done-toggle'+(folder.doneOpen?' open':'')+'" onclick="toggleDone('+folder.id+')"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg>'+t('done')+' ('+doneTasks.length+')</div><div class="done-tasks'+(folder.doneOpen?' open':'')+'">'+doneTasks.map(tt=>taskHTML(tt,false)).join("")+'</div></div>'}
 fhtml+='</div>';
 }
