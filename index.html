@@ -210,8 +210,10 @@ let S={
 };
 
 /* ─── AUTH ─── */
-function googleLogin(){auth.signInWithPopup(provider).catch(e=>{console.error(e);alert("Login error: "+e.message)})}
+function googleLogin(){auth.signInWithRedirect(provider)}
 function logout(){auth.signOut()}
+// Handle redirect result (for in-app browsers like Telegram)
+auth.getRedirectResult().catch(e=>{if(e.code!=='auth/credential-already-in-use'){console.error(e);alert("Login error: "+e.message)}});
 auth.onAuthStateChanged(u=>{
   if(u){
     document.getElementById("loginScreen").style.display="none";
