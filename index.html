@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Todooo – Планувальник завдань</title>
+<title>todooo</title>
 <style>
 :root{
   --bg0:#f5f4f0;--bg1:#fff;--bg2:#f0efeb;--bg3:#e8e7e3;
@@ -15,14 +15,56 @@
   --font:'Segoe UI','Helvetica Neue',system-ui,sans-serif;
   --shadow:0 1px 3px rgba(0,0,0,0.06);
   --shadow-lg:0 4px 16px rgba(0,0,0,0.1);
+  --today-highlight:#3B82F6;
 }
-@media(prefers-color-scheme:dark){:root{
+[data-theme="dark"]{
   --bg0:#141413;--bg1:#1e1e1c;--bg2:#282826;--bg3:#333331;
   --bd1:#3a3a38;--bd2:#4a4a48;--bd3:#2a2a28;
   --tx0:#e8e8e5;--tx1:#aaa;--tx2:#777;--tx3:#555;
   --accent:#5DCAA5;--accent-bg:rgba(93,202,165,0.1);--accent-bd:rgba(93,202,165,0.3);
   --shadow:0 1px 3px rgba(0,0,0,0.2);--shadow-lg:0 4px 16px rgba(0,0,0,0.3);
-}}
+  --today-highlight:#60A5FA;
+}
+[data-theme="hacker"]{
+  --bg0:#0a0a0a;--bg1:#111;--bg2:#1a1a1a;--bg3:#222;
+  --bd1:#1f3a1f;--bd2:#2a5a2a;--bd3:#162016;
+  --tx0:#00ff41;--tx1:#00cc33;--tx2:#009926;--tx3:#006619;
+  --accent:#00ff41;--accent-bg:rgba(0,255,65,0.08);--accent-bd:rgba(0,255,65,0.3);
+  --warn:#ffff00;--danger:#ff3333;
+  --font:'Courier New','Fira Code',monospace;
+  --shadow:0 0 8px rgba(0,255,65,0.15);--shadow-lg:0 0 20px rgba(0,255,65,0.2);
+  --today-highlight:#00ff41;
+}
+[data-theme="steampunk"]{
+  --bg0:#1c1410;--bg1:#2a1f18;--bg2:#352820;--bg3:#40322a;
+  --bd1:#6b5344;--bd2:#8b7355;--bd3:#4a382d;
+  --tx0:#d4a574;--tx1:#b8926a;--tx2:#8b7355;--tx3:#6b5344;
+  --accent:#c8882e;--accent-bg:rgba(200,136,46,0.12);--accent-bd:rgba(200,136,46,0.35);
+  --warn:#e8a020;--danger:#cc4422;
+  --font:Georgia,'Palatino Linotype',serif;
+  --shadow:0 2px 6px rgba(0,0,0,0.3);--shadow-lg:0 4px 16px rgba(0,0,0,0.4);
+  --today-highlight:#c8882e;
+}
+[data-theme="ocean"]{
+  --bg0:#0c1929;--bg1:#132238;--bg2:#1a2d47;--bg3:#213856;
+  --bd1:#2a4a6b;--bd2:#3a5a7b;--bd3:#1e3550;
+  --tx0:#c8ddf0;--tx1:#8aafc8;--tx2:#5a8aaa;--tx3:#3a6a8a;
+  --accent:#00b4d8;--accent-bg:rgba(0,180,216,0.1);--accent-bd:rgba(0,180,216,0.3);
+  --warn:#ffa62b;--danger:#ef476f;
+  --font:'Segoe UI','Helvetica Neue',system-ui,sans-serif;
+  --shadow:0 2px 8px rgba(0,0,0,0.3);--shadow-lg:0 4px 16px rgba(0,0,0,0.4);
+  --today-highlight:#00b4d8;
+}
+[data-theme="pastel"]{
+  --bg0:#fef6f0;--bg1:#fff9f5;--bg2:#fdf0e8;--bg3:#f8e5d8;
+  --bd1:#e8d4c4;--bd2:#d4bfaf;--bd3:#f0ddd0;
+  --tx0:#5a3e2e;--tx1:#8a6a55;--tx2:#aa8a75;--tx3:#c4a898;
+  --accent:#e07a5f;--accent-bg:rgba(224,122,95,0.08);--accent-bd:rgba(224,122,95,0.25);
+  --warn:#f2a65a;--danger:#e05555;
+  --font:'Georgia','Palatino',serif;
+  --shadow:0 1px 4px rgba(90,62,46,0.06);--shadow-lg:0 4px 16px rgba(90,62,46,0.1);
+  --today-highlight:#e07a5f;
+}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);background:var(--bg0);color:var(--tx0);display:flex;justify-content:center;min-height:100vh}
 input,button,select,textarea{font-family:var(--font)}
@@ -51,7 +93,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .tl-ok{background:var(--accent)}.tl-warn{background:var(--warn)}.tl-over{background:var(--danger)}
 
 /* Folder */
-.folder{background:var(--bg1);border:1px solid var(--bd3);border-radius:var(--rad-lg);margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
+.folder{background:var(--bg1);border:1px solid var(--bd3);border-radius:var(--rad-lg);margin-bottom:12px;box-shadow:var(--shadow);position:relative}
 .folder-head{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--bd3);background:var(--bg2);user-select:none;cursor:pointer}
 .folder-chevron{transition:transform .2s;flex-shrink:0;color:var(--tx2)}
 .folder-chevron.open{transform:rotate(90deg)}
@@ -117,7 +159,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .prio-badge-wrap{position:relative;display:inline-flex}
 .prio-badge{font-size:10px;font-weight:600;padding:1px 7px;border-radius:var(--rad);border:1px solid;white-space:nowrap;letter-spacing:.3px;cursor:pointer;user-select:none;transition:opacity .15s}
 .prio-badge:hover{opacity:.8}
-.prio-dropdown{position:absolute;top:100%;left:0;margin-top:4px;background:var(--bg1);border:1px solid var(--bd1);border-radius:var(--rad);box-shadow:var(--shadow-lg);z-index:100;min-width:130px;overflow:hidden;display:none}
+.prio-dropdown{position:absolute;top:100%;left:0;margin-top:4px;background:var(--bg1);border:1px solid var(--bd1);border-radius:var(--rad);box-shadow:var(--shadow-lg);z-index:200;min-width:130px;overflow:hidden;display:none}
 .prio-dropdown.open{display:block}
 .prio-opt{padding:6px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .1s}
 .prio-opt:hover{background:var(--bg2)}
@@ -125,14 +167,14 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 /* Folder label on task */
 .folder-label{font-size:10px;color:var(--tx2);background:var(--bg3);padding:1px 7px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .15s;border:1px solid transparent;user-select:none}
 .folder-label:hover{border-color:var(--bd2);color:var(--tx1)}
-.folder-popup{position:absolute;top:calc(100% + 2px);left:0;background:var(--bg1);border:1px solid var(--bd1);border-radius:var(--rad);box-shadow:var(--shadow-lg);z-index:100;min-width:150px;overflow:hidden;display:none}
+.folder-popup{position:absolute;top:calc(100% + 2px);left:0;background:var(--bg1);border:1px solid var(--bd1);border-radius:var(--rad);box-shadow:var(--shadow-lg);z-index:200;min-width:150px;overflow:hidden;display:none}
 .folder-popup.open{display:block}
 .folder-popup-opt{padding:6px 12px;font-size:12px;cursor:pointer;transition:background .1s}
 .folder-popup-opt:hover{background:var(--bg2)}
 .folder-popup-opt.current{font-weight:600;color:var(--accent)}
 
 /* Tag add popup on task */
-.tag-add-popup{position:absolute;bottom:100%;right:0;background:var(--bg1);border:1px solid var(--bd1);border-radius:var(--rad);box-shadow:var(--shadow-lg);z-index:100;min-width:140px;max-height:180px;overflow-y:auto;display:none;padding:4px 0}
+.tag-add-popup{position:absolute;bottom:100%;left:0;background:var(--bg1);border:1px solid var(--bd1);border-radius:var(--rad);box-shadow:var(--shadow-lg);z-index:200;min-width:140px;max-height:180px;overflow-y:auto;display:none;padding:4px 0}
 .tag-add-popup.open{display:block}
 .tag-add-opt{padding:5px 12px;font-size:12px;cursor:pointer;transition:background .1s;display:flex;align-items:center;gap:6px}
 .tag-add-opt:hover{background:var(--bg2)}
@@ -162,7 +204,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 
 /* Add task input */
 .add-task-row{display:flex;gap:6px;padding:6px 10px;border-top:1px solid var(--bd3)}
-.add-task-input{flex:1;border:1px solid transparent;background:var(--bg2);border-radius:var(--rad);padding:6px 10px;font-size:13px;color:var(--tx0)}
+.add-task-input{flex:1;border:1px solid transparent;background:var(--bg2);border-radius:var(--rad);padding:6px 10px;font-size:13px;color:var(--tx0);font-family:var(--font);resize:none;line-height:1.4;overflow:hidden}
 .add-task-input:focus{border-color:var(--accent);background:var(--bg1)}
 .add-task-input::placeholder{color:var(--tx3)}
 .add-task-btn{padding:6px 14px;border-radius:var(--rad);background:var(--accent);color:#fff;font-size:13px;font-weight:500;border:none;cursor:pointer;transition:opacity .15s}
@@ -194,7 +236,34 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .drag-ghost{position:fixed;pointer-events:none;z-index:9999;opacity:.85;padding:8px 16px;background:var(--bg1);border:2px solid var(--accent);border-radius:var(--rad);font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);max-width:250px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 
 /* Popup overlay */
-.popup-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:90}
+.popup-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:190}
+
+/* Theme switcher */
+.theme-bar{display:flex;align-items:center;gap:4px;margin-bottom:10px;flex-wrap:wrap}
+.theme-btn{padding:3px 10px;border-radius:var(--rad);font-size:11px;font-weight:600;border:1px solid var(--bd1);background:var(--bg1);color:var(--tx2);cursor:pointer;transition:all .15s}
+.theme-btn:hover{border-color:var(--bd2);color:var(--tx0)}
+.theme-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* Today button blue highlight */
+.task-left-btn.today-l.active{background:rgba(59,130,246,0.12)!important;border-color:var(--today-highlight)!important;color:var(--today-highlight)!important}
+
+/* Folder description */
+.folder-desc{font-size:11px;color:var(--tx2);border:none;background:none;font-family:var(--font);padding:2px 14px 4px;width:100%;outline:none;cursor:text;resize:none;line-height:1.4;border-bottom:1px solid var(--bd3);box-sizing:border-box}
+.folder-desc:hover{background:var(--bg2)}
+.folder-desc:focus{background:var(--bg1);outline:none;border-bottom-color:var(--accent)}
+.folder-desc::placeholder{color:var(--tx3);font-style:italic}
+
+/* Group drag handle */
+.folder-drag-handle{cursor:grab;color:var(--tx3);font-size:14px;padding:2px 4px;user-select:none;flex-shrink:0;transition:color .15s}
+.folder-drag-handle:hover{color:var(--tx1)}
+.folder-drag-handle:active{cursor:grabbing}
+.folder.folder-dragging{opacity:.3;transform:scale(.98)}
+
+/* Copy tasks button */
+.folder-copy-btn{padding:4px 8px;border-radius:var(--rad);color:var(--tx2);font-size:13px;transition:all .15s;cursor:pointer;background:none;border:none;position:relative}
+.folder-copy-btn:hover{background:var(--bg3);color:var(--tx0)}
+.copy-toast{position:absolute;top:-28px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:10px;padding:2px 8px;border-radius:4px;white-space:nowrap;pointer-events:none;animation:toastFade .8s ease forwards}
+@keyframes toastFade{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-8px)}}
 </style>
 </head>
 <body>
@@ -202,7 +271,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 
 <!-- LOGIN -->
 <div id="loginScreen">
-  <h1>📋 Todooo</h1>
+  <h1>todooo</h1>
   <p id="loginSubtitle">Увійди, щоб зберігати завдання в хмарі</p>
   <button id="googleBtn" onclick="googleLogin()">
     <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
@@ -220,6 +289,16 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
   <div class="lang-bar">
     <button class="lang-btn" data-lang="uk" onclick="setLang('uk')">🇺🇦 UA</button>
     <button class="lang-btn" data-lang="de" onclick="setLang('de')">🇩🇪 DE</button>
+  </div>
+  
+  <!-- Theme switcher -->
+  <div class="theme-bar">
+    <button class="theme-btn" data-theme="light" onclick="setTheme('light')">☀️ Light</button>
+    <button class="theme-btn" data-theme="dark" onclick="setTheme('dark')">🌙 Dark</button>
+    <button class="theme-btn" data-theme="hacker" onclick="setTheme('hacker')">💻 Hacker</button>
+    <button class="theme-btn" data-theme="steampunk" onclick="setTheme('steampunk')">⚙️ Steampunk</button>
+    <button class="theme-btn" data-theme="ocean" onclick="setTheme('ocean')">🌊 Ocean</button>
+    <button class="theme-btn" data-theme="pastel" onclick="setTheme('pastel')">🌸 Pastel</button>
   </div>
 
   <div class="top-bar">
@@ -268,9 +347,186 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 </div>
 
 <!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js">
+/* ─── CURSOR AT END ─── */
+function setCursorEnd(el){
+  requestAnimationFrame(()=>{
+    if(el.tagName==='TEXTAREA'||el.tagName==='INPUT'){
+      const len=el.value.length;
+      el.setSelectionRange(len,len);
+    }
+  });
+}
+
+/* ─── FOLDER DESCRIPTION ─── */
+function setFolderDesc(fid,v){const f=S.folders.find(x=>x.id===fid);if(f){f.desc=v}save()}
+
+/* ─── COPY FOLDER TASKS ─── */
+function copyFolderTasks(fid){
+  const folder=S.folders.find(x=>x.id===fid);
+  if(!folder)return;
+  const tasks=S.tasks.filter(tt=>tt.folderId===fid&&!tt.done);
+  const text=tasks.map(tt=>'  '+tt.title).join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    // Show toast
+    const btn=document.querySelector('.folder[data-folder-id="'+fid+'"] .folder-copy-btn');
+    if(btn){
+      const toast=document.createElement('span');toast.className='copy-toast';toast.textContent='✓';
+      btn.appendChild(toast);setTimeout(()=>toast.remove(),900);
+    }
+  }).catch(()=>{});
+}
+
+/* ─── FOLDER DRAG & DROP ─── */
+let dragFolderId=null;
+function onFolderDragStart(e,fid){
+  dragFolderId=fid;
+  e.dataTransfer.effectAllowed='move';
+  e.stopPropagation();
+  const el=e.target.closest('.folder');
+  if(el)el.classList.add('folder-dragging');
+}
+function onFolderDragEnd(e){
+  dragFolderId=null;
+  document.querySelectorAll('.folder.folder-dragging').forEach(el=>el.classList.remove('folder-dragging'));
+}
+function onFolderDragOver(e,fid){
+  e.preventDefault();e.stopPropagation();
+  if(fid===dragFolderId||!dragFolderId)return;
+}
+function onFolderDrop(e,targetFid){
+  e.preventDefault();e.stopPropagation();
+  if(!dragFolderId||dragFolderId===targetFid)return;
+  const fromIdx=S.folders.findIndex(f=>f.id===dragFolderId);
+  const toIdx=S.folders.findIndex(f=>f.id===targetFid);
+  if(fromIdx<0||toIdx<0)return;
+  const item=S.folders.splice(fromIdx,1)[0];
+  S.folders.splice(toIdx,0,item);
+  S.folders.forEach((f,i)=>f.order=i);
+  dragFolderId=null;render();save();
+}
+
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js">
+/* ─── CURSOR AT END ─── */
+function setCursorEnd(el){
+  requestAnimationFrame(()=>{
+    if(el.tagName==='TEXTAREA'||el.tagName==='INPUT'){
+      const len=el.value.length;
+      el.setSelectionRange(len,len);
+    }
+  });
+}
+
+/* ─── FOLDER DESCRIPTION ─── */
+function setFolderDesc(fid,v){const f=S.folders.find(x=>x.id===fid);if(f){f.desc=v}save()}
+
+/* ─── COPY FOLDER TASKS ─── */
+function copyFolderTasks(fid){
+  const folder=S.folders.find(x=>x.id===fid);
+  if(!folder)return;
+  const tasks=S.tasks.filter(tt=>tt.folderId===fid&&!tt.done);
+  const text=tasks.map(tt=>'  '+tt.title).join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    // Show toast
+    const btn=document.querySelector('.folder[data-folder-id="'+fid+'"] .folder-copy-btn');
+    if(btn){
+      const toast=document.createElement('span');toast.className='copy-toast';toast.textContent='✓';
+      btn.appendChild(toast);setTimeout(()=>toast.remove(),900);
+    }
+  }).catch(()=>{});
+}
+
+/* ─── FOLDER DRAG & DROP ─── */
+let dragFolderId=null;
+function onFolderDragStart(e,fid){
+  dragFolderId=fid;
+  e.dataTransfer.effectAllowed='move';
+  e.stopPropagation();
+  const el=e.target.closest('.folder');
+  if(el)el.classList.add('folder-dragging');
+}
+function onFolderDragEnd(e){
+  dragFolderId=null;
+  document.querySelectorAll('.folder.folder-dragging').forEach(el=>el.classList.remove('folder-dragging'));
+}
+function onFolderDragOver(e,fid){
+  e.preventDefault();e.stopPropagation();
+  if(fid===dragFolderId||!dragFolderId)return;
+}
+function onFolderDrop(e,targetFid){
+  e.preventDefault();e.stopPropagation();
+  if(!dragFolderId||dragFolderId===targetFid)return;
+  const fromIdx=S.folders.findIndex(f=>f.id===dragFolderId);
+  const toIdx=S.folders.findIndex(f=>f.id===targetFid);
+  if(fromIdx<0||toIdx<0)return;
+  const item=S.folders.splice(fromIdx,1)[0];
+  S.folders.splice(toIdx,0,item);
+  S.folders.forEach((f,i)=>f.order=i);
+  dragFolderId=null;render();save();
+}
+
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js">
+/* ─── CURSOR AT END ─── */
+function setCursorEnd(el){
+  requestAnimationFrame(()=>{
+    if(el.tagName==='TEXTAREA'||el.tagName==='INPUT'){
+      const len=el.value.length;
+      el.setSelectionRange(len,len);
+    }
+  });
+}
+
+/* ─── FOLDER DESCRIPTION ─── */
+function setFolderDesc(fid,v){const f=S.folders.find(x=>x.id===fid);if(f){f.desc=v}save()}
+
+/* ─── COPY FOLDER TASKS ─── */
+function copyFolderTasks(fid){
+  const folder=S.folders.find(x=>x.id===fid);
+  if(!folder)return;
+  const tasks=S.tasks.filter(tt=>tt.folderId===fid&&!tt.done);
+  const text=tasks.map(tt=>'  '+tt.title).join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    // Show toast
+    const btn=document.querySelector('.folder[data-folder-id="'+fid+'"] .folder-copy-btn');
+    if(btn){
+      const toast=document.createElement('span');toast.className='copy-toast';toast.textContent='✓';
+      btn.appendChild(toast);setTimeout(()=>toast.remove(),900);
+    }
+  }).catch(()=>{});
+}
+
+/* ─── FOLDER DRAG & DROP ─── */
+let dragFolderId=null;
+function onFolderDragStart(e,fid){
+  dragFolderId=fid;
+  e.dataTransfer.effectAllowed='move';
+  e.stopPropagation();
+  const el=e.target.closest('.folder');
+  if(el)el.classList.add('folder-dragging');
+}
+function onFolderDragEnd(e){
+  dragFolderId=null;
+  document.querySelectorAll('.folder.folder-dragging').forEach(el=>el.classList.remove('folder-dragging'));
+}
+function onFolderDragOver(e,fid){
+  e.preventDefault();e.stopPropagation();
+  if(fid===dragFolderId||!dragFolderId)return;
+}
+function onFolderDrop(e,targetFid){
+  e.preventDefault();e.stopPropagation();
+  if(!dragFolderId||dragFolderId===targetFid)return;
+  const fromIdx=S.folders.findIndex(f=>f.id===dragFolderId);
+  const toIdx=S.folders.findIndex(f=>f.id===targetFid);
+  if(fromIdx<0||toIdx<0)return;
+  const item=S.folders.splice(fromIdx,1)[0];
+  S.folders.splice(toIdx,0,item);
+  S.folders.forEach((f,i)=>f.order=i);
+  dragFolderId=null;render();save();
+}
+
+</script>
 
 <script>
 /* ═══════════════════════════════════════
@@ -322,6 +578,7 @@ const LANG={
     prioLowL:"⚪ Низький",
     tagLabel:"🏷",
     deleteTag:"Видалити тег?",
+    folderDescPh:"Опис групи…",
   },
   de:{
     loginSubtitle:"Melde dich an, um Aufgaben in der Cloud zu speichern",
@@ -368,6 +625,7 @@ const LANG={
     prioLowL:"⚪ Niedrig",
     tagLabel:"🏷",
     deleteTag:"Tag löschen?",
+    folderDescPh:"Gruppenbeschreibung…",
   }
 };
 let curLang=localStorage.getItem('todooo_lang')||'uk';
@@ -381,8 +639,25 @@ function applyI18n(){
   document.querySelectorAll('.lang-btn').forEach(b=>{
     b.classList.toggle('active',b.getAttribute('data-lang')===curLang);
   });
+  document.querySelectorAll('.theme-btn').forEach(b=>{
+    b.classList.toggle('active',b.getAttribute('data-theme')===curTheme);
+  });
   document.documentElement.lang=curLang==='de'?'de':'uk';
 }
+
+/* ═══════════════════════════════════════
+   Themes
+   ═══════════════════════════════════════ */
+let curTheme=localStorage.getItem('todooo_theme')||'light';
+function setTheme(th){
+  curTheme=th;localStorage.setItem('todooo_theme',th);
+  if(th==='light')document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme',th);
+  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.getAttribute('data-theme')===curTheme));
+  render();
+}
+// Apply saved theme on load
+if(curTheme!=='light')document.documentElement.setAttribute('data-theme',curTheme);
 
 /* ═══════════════════════════════════════ */
 const firebaseConfig={apiKey:"AIzaSyDYR5F3tPBCQgFlftpGa7DnvIHb2pXZ4_Y",authDomain:"todooo-e2420.firebaseapp.com",projectId:"todooo-e2420",storageBucket:"todooo-e2420.firebasestorage.app",messagingSenderId:"644820241408",appId:"1:644820241408:web:d16cdd7b73e75833109ce5"};
@@ -491,7 +766,7 @@ async function loadFromCloud(){
         if(t.order===undefined)t.order=0;
         if(!t.tags)t.tags=[];
       });
-      S.folders.forEach(f=>{if(f.collapsed===undefined)f.collapsed=false});
+      S.folders.forEach(f=>{if(f.collapsed===undefined)f.collapsed=false;if(f.desc===undefined)f.desc=""});
       if(S.deadline){
         const dt=new Date(S.deadline),p=n=>String(n).padStart(2,'0');
         document.getElementById("deadline").value=dt.getFullYear()+'-'+p(dt.getMonth()+1)+'-'+p(dt.getDate())+'T'+p(dt.getHours())+':'+p(dt.getMinutes());
@@ -504,14 +779,13 @@ async function loadFromCloud(){
 }
 
 /* ─── COLORS ─── */
-const dk=window.matchMedia?.('(prefers-color-scheme:dark)').matches;
 const C={
   red:{bg:"#FCEBEB",bd:"#D35050",tx:"#991F1F",dbg:"#501313",dbd:"#F09595",dtx:"#F7C1C1"},
   amber:{bg:"#FFF3DC",bd:"#C47B15",tx:"#7A4A08",dbg:"#412402",dbd:"#EF9F27",dtx:"#FAC775"},
   teal:{bg:"#E1F5EE",bd:"#1D9E75",tx:"#0B6B4F",dbg:"#04342C",dbd:"#5DCAA5",dtx:"#9FE1CB"},
   gray:{bg:"#F1F0EC",bd:"#8A8985",tx:"#55544F",dbg:"#2C2C2A",dbd:"#B4B2A9",dtx:"#D3D1C7"}
 };
-function gc(c){const v=C[c]||C.gray;return dk?{bg:v.dbg,bd:v.dbd,tx:v.dtx}:{bg:v.bg,bd:v.bd,tx:v.tx}}
+function gc(c){const v=C[c]||C.gray;const isDark=curTheme!=='light'&&curTheme!=='pastel';return isDark?{bg:v.dbg,bd:v.dbd,tx:v.dtx}:{bg:v.bg,bd:v.bd,tx:v.tx}}
 function getPrioMap(){return{red:t('prioUrgent'),amber:t('prioImportant'),teal:t('prioMedium'),gray:t('prioLow')}}
 function fm(m){if(!m)return"0 "+t('min');if(m<60)return m+" "+t('min');const h=Math.floor(m/60),r=m%60;return r?h+" "+t('hourWithMin')+" "+r+" "+t('min'):h+" "+t('hourShort')}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -774,23 +1048,25 @@ function taskHTML(tt){
     <input type="checkbox" class="task-cb" ${isDone?"checked":""} onchange="tog(${tt.id})"/>
     <div class="task-main">
       ${!isDone?`<div class="task-top-btns">
-        <button class="task-left-btn now-l${tt.now?' active':''}" onclick="setNow(${tt.id})" title="${t('now')}">⚡${t('now')}</button>
-        <button class="task-left-btn today-l${tt.today?' active':''}" onclick="setToday(${tt.id})" title="${t('today')}">📅${t('today')}</button>
-      </div>`:''}
-      <div class="task-title-row">
         <div class="prio-badge-wrap">
           <span class="prio-badge" style="background:${c.bg};color:${c.tx};border-color:${c.bd}" onclick="event.stopPropagation();togglePrio(${tt.id})">${esc(prioLabel)}</span>
           <div class="prio-dropdown" id="prioDd_${tt.id}">${prioOpts}</div>
         </div>
-        ${tt.today&&!tt.now?'<span style="font-size:10px;color:var(--warn);font-weight:600">📅 '+t('today')+'</span>':''}
+        <button class="task-left-btn now-l${tt.now?' active':''}" onclick="setNow(${tt.id})" title="${t('now')}">⚡${t('now')}</button>
+        <button class="task-left-btn today-l${tt.today?' active':''}" onclick="setToday(${tt.id})" title="${t('today')}">📅${t('today')}</button>
+      </div>`:`<div style="margin-bottom:3px"><div class="prio-badge-wrap">
+          <span class="prio-badge" style="background:${c.bg};color:${c.tx};border-color:${c.bd}" onclick="event.stopPropagation();togglePrio(${tt.id})">${esc(prioLabel)}</span>
+          <div class="prio-dropdown" id="prioDd_${tt.id}">${prioOpts}</div>
+        </div></div>`}
+      <div class="task-title-row">
         <textarea class="task-title${isDone?' strike':''}" rows="1"
           oninput="autoGrow(this)" onchange="setTitle(${tt.id},this.value)"
           onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"
-          onfocus="this.select()">${esc(tt.title)}</textarea>
+          onfocus="setCursorEnd(this)">${esc(tt.title)}</textarea>
       </div>
       <textarea class="task-note" rows="1" placeholder="…"
         oninput="autoGrow(this)" onchange="setNote(${tt.id},this.value)"
-        onfocus="autoGrow(this)">${esc(tt.note)}</textarea>
+        onfocus="setCursorEnd(this);autoGrow(this)">${esc(tt.note)}</textarea>
       <div class="task-row">
         <input type="number" class="dur-input" value="${tt.mins||0}" min="0" step="5" onchange="setMins(${tt.id},this.value)"/>
         <span class="dur-label">${t('min')}</span>
@@ -873,13 +1149,18 @@ function render(){
     const total=allFolderTasks.length;
     const collapsed=folder.collapsed;
 
-    fhtml+=`<div class="folder">
+    fhtml+=`<div class="folder" data-folder-id="${folder.id}">
       <div class="folder-head" onclick="toggleFolder(${folder.id})">
+        <span class="folder-drag-handle" draggable="true" ondragstart="onFolderDragStart(event,${folder.id})" ondragend="onFolderDragEnd(event)" ondragover="onFolderDragOver(event,${folder.id})" ondrop="onFolderDrop(event,${folder.id})" onclick="event.stopPropagation()" title="⠿">⠿</span>
         <svg class="folder-chevron${collapsed?'':' open'}" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg>
-        <input class="folder-name" value="${esc(folder.name)}" onchange="renameFolder(${folder.id},this)" onfocus="this.select()" onclick="event.stopPropagation()"/>
+        <button class="folder-copy-btn" onclick="event.stopPropagation();copyFolderTasks(${folder.id})" title="📋">📋</button>
+        <input class="folder-name" value="${esc(folder.name)}" onchange="renameFolder(${folder.id},this)" onfocus="setCursorEnd(this)" onclick="event.stopPropagation()"/>
         <span class="folder-count">${total}</span>
         <button class="folder-btn" onclick="event.stopPropagation();removeFolder(${folder.id})" title="🗑">🗑</button>
       </div>
+      <textarea class="folder-desc" rows="1" placeholder="${t('folderDescPh')}"
+        oninput="autoGrow(this)" onchange="setFolderDesc(${folder.id},this.value)"
+        onfocus="setCursorEnd(this);autoGrow(this)" onclick="event.stopPropagation()">${esc(folder.desc||'')}</textarea>
       <div class="folder-body${collapsed?' collapsed':''}" style="${collapsed?'':'max-height:9999px'}">`;
 
     if(fTasks.length){
@@ -904,8 +1185,9 @@ function render(){
 
     // Add task input (always visible, even when collapsed)
     fhtml+=`<div class="add-task-row">
-      <input type="text" class="add-task-input" id="addInp_${folder.id}" placeholder="${t('newTaskPh')}"
-        onkeydown="if(event.key==='Enter')addTaskInFolder(${folder.id})"/>
+      <textarea class="add-task-input" id="addInp_${folder.id}" placeholder="${t('newTaskPh')}" rows="1"
+        oninput="autoGrow(this)"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addTaskInFolder(${folder.id})}"></textarea>
       <button class="add-task-btn" onclick="addTaskInFolder(${folder.id})">+</button>
     </div>`;
 
@@ -921,11 +1203,72 @@ function render(){
   upTL();
   document.querySelectorAll('.task-note').forEach(autoGrow);
   document.querySelectorAll('.task-title').forEach(autoGrow);
+  document.querySelectorAll('.folder-desc').forEach(autoGrow);
+  document.querySelectorAll('.add-task-input').forEach(autoGrow);
 }
 
 function autoGrow(el){
   if(!el)return;el.style.height='auto';el.style.height=Math.max(18,el.scrollHeight)+'px';
 }
+
+/* ─── CURSOR AT END ─── */
+function setCursorEnd(el){
+  requestAnimationFrame(()=>{
+    if(el.tagName==='TEXTAREA'||el.tagName==='INPUT'){
+      const len=el.value.length;
+      el.setSelectionRange(len,len);
+    }
+  });
+}
+
+/* ─── FOLDER DESCRIPTION ─── */
+function setFolderDesc(fid,v){const f=S.folders.find(x=>x.id===fid);if(f){f.desc=v}save()}
+
+/* ─── COPY FOLDER TASKS ─── */
+function copyFolderTasks(fid){
+  const folder=S.folders.find(x=>x.id===fid);
+  if(!folder)return;
+  const tasks=S.tasks.filter(tt=>tt.folderId===fid&&!tt.done);
+  const text=tasks.map(tt=>'  '+tt.title).join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    // Show toast
+    const btn=document.querySelector('.folder[data-folder-id="'+fid+'"] .folder-copy-btn');
+    if(btn){
+      const toast=document.createElement('span');toast.className='copy-toast';toast.textContent='✓';
+      btn.appendChild(toast);setTimeout(()=>toast.remove(),900);
+    }
+  }).catch(()=>{});
+}
+
+/* ─── FOLDER DRAG & DROP ─── */
+let dragFolderId=null;
+function onFolderDragStart(e,fid){
+  dragFolderId=fid;
+  e.dataTransfer.effectAllowed='move';
+  e.stopPropagation();
+  const el=e.target.closest('.folder');
+  if(el)el.classList.add('folder-dragging');
+}
+function onFolderDragEnd(e){
+  dragFolderId=null;
+  document.querySelectorAll('.folder.folder-dragging').forEach(el=>el.classList.remove('folder-dragging'));
+}
+function onFolderDragOver(e,fid){
+  e.preventDefault();e.stopPropagation();
+  if(fid===dragFolderId||!dragFolderId)return;
+}
+function onFolderDrop(e,targetFid){
+  e.preventDefault();e.stopPropagation();
+  if(!dragFolderId||dragFolderId===targetFid)return;
+  const fromIdx=S.folders.findIndex(f=>f.id===dragFolderId);
+  const toIdx=S.folders.findIndex(f=>f.id===targetFid);
+  if(fromIdx<0||toIdx<0)return;
+  const item=S.folders.splice(fromIdx,1)[0];
+  S.folders.splice(toIdx,0,item);
+  S.folders.forEach((f,i)=>f.order=i);
+  dragFolderId=null;render();save();
+}
+
 </script>
 </body>
 </html>
