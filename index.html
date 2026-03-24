@@ -38,6 +38,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 
 .wrap{padding:1rem;max-width:680px;width:100%}
 
+/* Language bar */
+.lang-bar{display:flex;align-items:center;gap:4px;margin-bottom:10px;justify-content:flex-end}
+.lang-btn{padding:3px 10px;border-radius:var(--rad);font-size:12px;font-weight:600;border:1px solid var(--bd1);background:var(--bg1);color:var(--tx2);cursor:pointer;transition:all .15s}
+.lang-btn:hover{border-color:var(--bd2);color:var(--tx0)}
+.lang-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
 /* Timeline */
 .tl-card{padding:14px 18px;background:var(--bg1);border:1px solid var(--bd3);border-radius:var(--rad-lg);margin-bottom:1.2rem;box-shadow:var(--shadow)}
 .tl-bar-bg{background:var(--bg2);height:10px;border-radius:5px;overflow:hidden;margin:10px 0 6px}
@@ -46,19 +52,42 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 
 /* Folder */
 .folder{background:var(--bg1);border:1px solid var(--bd3);border-radius:var(--rad-lg);margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
-.folder-head{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--bd3);background:var(--bg2);user-select:none}
+.folder-head{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--bd3);background:var(--bg2);user-select:none;cursor:pointer}
+.folder-chevron{transition:transform .2s;flex-shrink:0;color:var(--tx2)}
+.folder-chevron.open{transform:rotate(90deg)}
 .folder-name{font-size:15px;font-weight:600;flex:1;min-width:0;background:none;border:none;color:var(--tx0);font-family:var(--font);padding:2px 4px;border-radius:4px;cursor:text}
 .folder-name:hover{background:var(--bg3)}
 .folder-name:focus{background:var(--bg1);outline:2px solid var(--accent);outline-offset:-1px}
 .folder-count{font-size:11px;color:var(--tx2);background:var(--bg3);padding:1px 8px;border-radius:10px}
 .folder-btn{padding:4px 8px;border-radius:var(--rad);color:var(--tx2);font-size:16px;transition:all .15s}
 .folder-btn:hover{background:var(--bg3);color:var(--tx0)}
-.folder-body{padding:4px 0}
+.folder-body{padding:4px 0;transition:max-height .3s ease,opacity .2s;overflow:hidden}
+.folder-body.collapsed{max-height:0!important;opacity:0;padding:0}
 
 /* Now Section */
 .now-section{background:var(--accent-bg);border-bottom:1px solid var(--accent-bd);margin-bottom:0}
 .now-header{display:flex;align-items:center;gap:6px;padding:8px 14px;font-size:13px;font-weight:600;color:var(--accent)}
 .now-header svg{flex-shrink:0}
+
+/* Tags panel */
+.tags-panel{background:var(--bg1);border:1px solid var(--bd3);border-radius:var(--rad-lg);margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
+.tags-header{display:flex;align-items:center;gap:6px;padding:8px 14px;font-size:13px;font-weight:600;color:var(--tx1);cursor:pointer;user-select:none}
+.tags-body{padding:6px 10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tag-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;background:var(--bg3);color:var(--tx1);cursor:pointer;user-select:none;border:1.5px solid transparent;transition:all .15s;position:relative}
+.tag-chip:hover{background:var(--bg2);border-color:var(--bd2)}
+.tag-chip.selected{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
+.tag-chip.dragging-tag{opacity:.4}
+.tag-chip .tag-rm{font-size:13px;line-height:1;margin-left:2px;color:var(--tx3);cursor:pointer;display:none}
+.tag-chip:hover .tag-rm{display:inline}
+.tag-chip .tag-rm:hover{color:var(--danger)}
+.add-tag-input{border:1px dashed var(--bd1);border-radius:12px;padding:3px 10px;font-size:11px;width:90px;background:var(--bg2);color:var(--tx0);outline:none}
+.add-tag-input:focus{border-color:var(--accent);border-style:solid}
+
+/* Task tag chips (in task) */
+.task-tag{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600;background:var(--bg3);color:var(--tx1);cursor:default;border:1px solid transparent}
+.task-tag .ttag-rm{font-size:11px;cursor:pointer;color:var(--tx3);display:none}
+.task-tag:hover .ttag-rm{display:inline}
+.task-tag:hover{border-color:var(--bd2)}
 
 /* Task */
 .task{display:flex;gap:8px;align-items:flex-start;padding:8px 14px;border-bottom:1px solid var(--bd3);transition:all .15s;position:relative}
@@ -66,28 +95,53 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .task.dragging{opacity:.25;transform:scale(.98)}
 .task.done-task{opacity:.45}
 .task-cb{margin-top:3px;width:17px;height:17px;cursor:pointer;accent-color:var(--accent);flex-shrink:0}
+.task-left-btns{display:flex;flex-direction:column;gap:2px;flex-shrink:0;margin-top:1px}
+.task-left-btn{padding:1px 5px;border-radius:4px;font-size:9px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;border:1px solid transparent;background:none;line-height:1.3}
+.task-left-btn.now-l{color:var(--accent)}
+.task-left-btn.now-l:hover,.task-left-btn.now-l.active{background:var(--accent-bg);border-color:var(--accent-bd)}
+.task-left-btn.today-l{color:var(--warn)}
+.task-left-btn.today-l:hover,.task-left-btn.today-l.active{background:rgba(239,159,39,0.08);border-color:rgba(239,159,39,0.25)}
 .task-main{flex:1;min-width:0}
+.task-title-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .task-title{font-size:14px;font-weight:500;width:100%;border:none;background:none;color:var(--tx0);font-family:var(--font);padding:1px 0;outline:none;cursor:text}
 .task-title:focus{background:var(--bg2);border-radius:4px;padding:1px 6px}
 .task-title.strike{text-decoration:line-through;color:var(--tx2)}
 .task-note{font-size:12px;width:100%;border:none;background:none;color:var(--tx1);font-family:var(--font);padding:1px 0;outline:none;resize:none;cursor:text;margin-top:2px;line-height:1.4}
 .task-note:focus{background:var(--bg2);border-radius:4px;padding:2px 6px}
 .task-row{display:flex;align-items:center;gap:6px;margin-top:5px;flex-wrap:wrap}
-.dur-input{width:48px;font-size:12px;padding:2px 6px;text-align:center;border:1px solid var(--bd1);border-radius:var(--rad);background:var(--bg1);color:var(--tx0)}
+.dur-input{width:60px;font-size:12px;padding:2px 6px;text-align:center;border:1px solid var(--bd1);border-radius:var(--rad);background:var(--bg1);color:var(--tx0)}
 .dur-label{font-size:11px;color:var(--tx2)}
-.prio-select{font-size:12px;padding:2px 4px;border:1px solid var(--bd1);border-radius:var(--rad);background:var(--bg1);color:var(--tx0);cursor:pointer}
+
+/* Priority badge as dropdown */
+.prio-badge-wrap{position:relative;display:inline-flex}
+.prio-badge{font-size:10px;font-weight:600;padding:1px 7px;border-radius:var(--rad);border:1px solid;white-space:nowrap;letter-spacing:.3px;cursor:pointer;user-select:none;transition:opacity .15s}
+.prio-badge:hover{opacity:.8}
+.prio-dropdown{position:absolute;top:100%;left:0;margin-top:4px;background:var(--bg1);border:1px solid var(--bd1);border-radius:var(--rad);box-shadow:var(--shadow-lg);z-index:100;min-width:130px;overflow:hidden;display:none}
+.prio-dropdown.open{display:block}
+.prio-opt{padding:6px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .1s}
+.prio-opt:hover{background:var(--bg2)}
+
+/* Folder label on task */
+.folder-label{font-size:10px;color:var(--tx2);background:var(--bg3);padding:1px 7px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .15s;border:1px solid transparent;user-select:none}
+.folder-label:hover{border-color:var(--bd2);color:var(--tx1)}
+.folder-popup{position:absolute;top:calc(100% + 2px);left:0;background:var(--bg1);border:1px solid var(--bd1);border-radius:var(--rad);box-shadow:var(--shadow-lg);z-index:100;min-width:150px;overflow:hidden;display:none}
+.folder-popup.open{display:block}
+.folder-popup-opt{padding:6px 12px;font-size:12px;cursor:pointer;transition:background .1s}
+.folder-popup-opt:hover{background:var(--bg2)}
+.folder-popup-opt.current{font-weight:600;color:var(--accent)}
+
+/* Tag add popup on task */
+.tag-add-popup{position:absolute;bottom:100%;right:0;background:var(--bg1);border:1px solid var(--bd1);border-radius:var(--rad);box-shadow:var(--shadow-lg);z-index:100;min-width:140px;max-height:180px;overflow-y:auto;display:none;padding:4px 0}
+.tag-add-popup.open{display:block}
+.tag-add-opt{padding:5px 12px;font-size:12px;cursor:pointer;transition:background .1s;display:flex;align-items:center;gap:6px}
+.tag-add-opt:hover{background:var(--bg2)}
+.tag-add-opt .check{color:var(--accent);font-weight:bold}
+
 .task-actions{display:flex;flex-direction:column;gap:2px;flex-shrink:0;align-items:flex-end}
-.act-btn{padding:2px 5px;border-radius:4px;font-size:11px;font-weight:500;color:var(--tx2);cursor:pointer;white-space:nowrap;transition:all .15s;border:1px solid transparent;background:none}
-.act-btn:hover{background:var(--bg2);color:var(--tx0)}
-.act-btn.now-btn{color:var(--accent)}
-.act-btn.now-btn:hover{background:var(--accent-bg);border-color:var(--accent-bd)}
-.act-btn.today-btn{color:var(--warn)}
-.act-btn.today-btn:hover{background:rgba(239,159,39,0.08);border-color:rgba(239,159,39,0.25)}
-.act-btn.today-btn.active{background:rgba(239,159,39,0.15);border-color:var(--warn);color:#b37600}
 .del-btn{color:var(--tx3);font-size:15px;padding:0 4px;cursor:pointer;background:none;border:none}
 .del-btn:hover{color:var(--danger)}
 
-/* Badges */
+/* Badges (legacy compat) */
 .badge{font-size:10px;font-weight:600;padding:1px 7px;border-radius:var(--rad);border:1px solid;white-space:nowrap;letter-spacing:.3px}
 
 /* Drop Indicator */
@@ -131,16 +185,15 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 #loginScreen p{color:var(--tx1);font-size:15px}
 #googleBtn{display:flex;align-items:center;gap:10px;padding:12px 28px;font-size:16px;font-weight:500;border:2px solid var(--bd1);border-radius:var(--rad-lg);cursor:pointer;background:var(--bg1);color:var(--tx0);transition:all .2s}
 #googleBtn:hover{box-shadow:var(--shadow-lg);border-color:var(--bd2)}
-.tg-warn{max-width:320px;text-align:center;font-size:13px;color:var(--tx1);line-height:1.5}
-.tg-warn b{color:var(--tx0)}
-#openBrowserBtn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;font-size:16px;font-weight:600;border:2px solid var(--accent);border-radius:var(--rad-lg);cursor:pointer;background:var(--accent);color:#fff;transition:all .2s;text-decoration:none}
-#openBrowserBtn:hover{opacity:.9;box-shadow:var(--shadow-lg)}
 
 /* Stats */
 .stats{font-size:12px;color:var(--tx2);text-align:center;padding:8px 0}
 
 /* Drag ghost */
 .drag-ghost{position:fixed;pointer-events:none;z-index:9999;opacity:.85;padding:8px 16px;background:var(--bg1);border:2px solid var(--accent);border-radius:var(--rad);font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);max-width:250px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+
+/* Popup overlay */
+.popup-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:90}
 </style>
 </head>
 <body>
@@ -149,48 +202,64 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 <!-- LOGIN -->
 <div id="loginScreen">
   <h1>📋 Todooo</h1>
-  <p>Увійди, щоб зберігати завдання в хмарі</p>
+  <p id="loginSubtitle">Увійди, щоб зберігати завдання в хмарі</p>
   <button id="googleBtn" onclick="googleLogin()">
     <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-    Увійти з Google
+    <span data-i18n="loginBtn">Увійти з Google</span>
   </button>
   <div id="tgFallback" style="display:none;flex-direction:column;align-items:center;gap:16px">
-    <a id="openBrowserBtn" href="" target="_blank" style="display:flex;align-items:center;gap:10px;padding:12px 28px;font-size:16px;font-weight:500;border:2px solid var(--accent);border-radius:var(--rad-lg);cursor:pointer;background:var(--accent);color:#fff;text-decoration:none;transition:opacity .2s" onclick="this.href=window.location.href">🌐 Відкрити у браузері</a>
-    <p style="color:var(--tx2);font-size:13px;line-height:1.5;max-width:300px">Telegram-браузер не підтримує Google Login.<br>Натисни кнопку вище, щоб увійти через <b>Chrome / Safari</b>.</p>
+    <a id="openBrowserBtn" href="" target="_blank" style="display:flex;align-items:center;gap:10px;padding:12px 28px;font-size:16px;font-weight:500;border:2px solid var(--accent);border-radius:var(--rad-lg);cursor:pointer;background:var(--accent);color:#fff;text-decoration:none;transition:opacity .2s" onclick="this.href=window.location.href">🌐 <span data-i18n="openBrowser">Відкрити у браузері</span></a>
+    <p style="color:var(--tx2);font-size:13px;line-height:1.5;max-width:300px" data-i18n="tgNote">Telegram-браузер не підтримує Google Login. Натисни кнопку вище, щоб увійти через Chrome / Safari.</p>
   </div>
 </div>
 
 <!-- APP -->
 <div id="mainApp" style="display:none">
+  <!-- Language bar -->
+  <div class="lang-bar">
+    <button class="lang-btn" data-lang="uk" onclick="setLang('uk')">🇺🇦 UA</button>
+    <button class="lang-btn" data-lang="de" onclick="setLang('de')">🇩🇪 DE</button>
+  </div>
+
   <div class="top-bar">
     <img id="userPhoto" src="" alt=""/>
     <span id="userName"></span>
     <div style="flex:1"></div>
     <span id="syncStatus" class="sync-badge sync-load">🔄</span>
-    <button class="logout-btn" onclick="logout()">Вийти</button>
+    <button class="logout-btn" onclick="logout()" data-i18n="logoutBtn">Вийти</button>
   </div>
 
   <!-- Timeline -->
   <div class="tl-card">
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <label style="font-size:13px;color:var(--tx1)">Дедлайн:</label>
+      <label style="font-size:13px;color:var(--tx1)" data-i18n="deadlineLabel">Дедлайн:</label>
       <input type="datetime-local" id="deadline" style="font-size:13px;padding:4px 8px"/>
-      <button onclick="setDeadline()" style="padding:5px 14px;background:var(--accent);color:#fff;border-radius:var(--rad);font-size:13px">Встановити</button>
+      <button onclick="setDeadline()" style="padding:5px 14px;background:var(--accent);color:#fff;border-radius:var(--rad);font-size:13px" data-i18n="setBtn">Встановити</button>
     </div>
     <div id="timeInfo" style="font-size:12px;color:var(--tx1);margin-top:8px"></div>
     <div class="tl-bar-bg"><div class="tl-bar-fill" id="tlFill"></div></div>
     <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx2)">
-      <span>Зараз</span><span id="dlLabel">Не встановлено</span>
+      <span data-i18n="nowLabel">Зараз</span><span id="dlLabel" data-i18n="notSet">Не встановлено</span>
     </div>
   </div>
 
   <!-- NOW zone (global) -->
   <div id="nowZone"></div>
 
+  <!-- Tags panel -->
+  <div class="tags-panel" id="tagsPanel">
+    <div class="tags-header" onclick="toggleTagsPanel()">
+      <svg class="folder-chevron open" id="tagsChevron" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg>
+      🏷️ <span data-i18n="tagsTitle">Теги</span>
+      <span class="folder-count" id="tagsCount">0</span>
+    </div>
+    <div class="tags-body" id="tagsBody"></div>
+  </div>
+
   <!-- Folders -->
   <div id="foldersContainer"></div>
 
-  <button class="add-folder-btn" onclick="addFolder()">＋ Нова папка</button>
+  <button class="add-folder-btn" onclick="addFolder()">＋ <span data-i18n="newFolder">Нова папка</span></button>
 
   <div class="stats" id="stats"></div>
 </div>
@@ -203,6 +272,114 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
 <script>
+/* ═══════════════════════════════════════
+   i18n
+   ═══════════════════════════════════════ */
+const LANG={
+  uk:{
+    loginSubtitle:"Увійди, щоб зберігати завдання в хмарі",
+    loginBtn:"Увійти з Google",
+    openBrowser:"Відкрити у браузері",
+    tgNote:"Telegram-браузер не підтримує Google Login. Натисни кнопку вище, щоб увійти через Chrome / Safari.",
+    logoutBtn:"Вийти",
+    deadlineLabel:"Дедлайн:",
+    setBtn:"Встановити",
+    nowLabel:"Зараз",
+    notSet:"Не встановлено",
+    tagsTitle:"Теги",
+    newFolder:"Нова папка",
+    addTagPh:"+ тег…",
+    newTaskPh:"Нове завдання…",
+    dragHere:"Перетягни сюди",
+    dragTaskHere:"Перетягни завдання сюди",
+    done:"Зроблені",
+    deleteTask:"Видалити завдання?",
+    deleteFolder:"Видалити папку та всі завдання в ній?",
+    folderNamePrompt:"Назва папки:",
+    needOneFolder:"Потрібна хоча б одна папка",
+    now:"зараз",
+    today:"сьогодні",
+    min:"хв",
+    of:"з",
+    doneLabel:"зроблено",
+    forToday:"на сьогодні",
+    available:"Доступно",
+    todayLabel:"Сьогодні",
+    reserve:"Запас",
+    missing:"Бракує",
+    tasksToday:"Завдань на сьогодні",
+    prioUrgent:"ТЕРМІНОВО",
+    prioImportant:"ВАЖЛИВО",
+    prioMedium:"СЕРЕДНЄ",
+    prioLow:"НИЗЬКИЙ",
+    prioNew:"НОВЕ",
+    prioUrgentL:"🔴 Терміново",
+    prioImportantL:"🟠 Важливо",
+    prioMediumL:"🟢 Середнє",
+    prioLowL:"⚪ Низький",
+    tagLabel:"🏷",
+    deleteTag:"Видалити тег?",
+  },
+  de:{
+    loginSubtitle:"Melde dich an, um Aufgaben in der Cloud zu speichern",
+    loginBtn:"Mit Google anmelden",
+    openBrowser:"Im Browser öffnen",
+    tgNote:"Der Telegram-Browser unterstützt kein Google Login. Drücke oben, um dich über Chrome / Safari anzumelden.",
+    logoutBtn:"Abmelden",
+    deadlineLabel:"Frist:",
+    setBtn:"Setzen",
+    nowLabel:"Jetzt",
+    notSet:"Nicht gesetzt",
+    tagsTitle:"Tags",
+    newFolder:"Neuer Ordner",
+    addTagPh:"+ Tag…",
+    newTaskPh:"Neue Aufgabe…",
+    dragHere:"Hierher ziehen",
+    dragTaskHere:"Aufgabe hierher ziehen",
+    done:"Erledigt",
+    deleteTask:"Aufgabe löschen?",
+    deleteFolder:"Ordner und alle Aufgaben darin löschen?",
+    folderNamePrompt:"Ordnername:",
+    needOneFolder:"Mindestens ein Ordner ist erforderlich",
+    now:"jetzt",
+    today:"heute",
+    min:"Min",
+    of:"von",
+    doneLabel:"erledigt",
+    forToday:"für heute",
+    available:"Verfügbar",
+    todayLabel:"Heute",
+    reserve:"Reserve",
+    missing:"Fehlt",
+    tasksToday:"Aufgaben für heute",
+    prioUrgent:"DRINGEND",
+    prioImportant:"WICHTIG",
+    prioMedium:"MITTEL",
+    prioLow:"NIEDRIG",
+    prioNew:"NEU",
+    prioUrgentL:"🔴 Dringend",
+    prioImportantL:"🟠 Wichtig",
+    prioMediumL:"🟢 Mittel",
+    prioLowL:"⚪ Niedrig",
+    tagLabel:"🏷",
+    deleteTag:"Tag löschen?",
+  }
+};
+let curLang=localStorage.getItem('todooo_lang')||'uk';
+function t(key){return (LANG[curLang]&&LANG[curLang][key])||LANG.uk[key]||key}
+function setLang(l){curLang=l;localStorage.setItem('todooo_lang',l);applyI18n();render()}
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    const v=t(k);if(v)el.textContent=v;
+  });
+  document.querySelectorAll('.lang-btn').forEach(b=>{
+    b.classList.toggle('active',b.getAttribute('data-lang')===curLang);
+  });
+  document.documentElement.lang=curLang==='de'?'de':'uk';
+}
+
+/* ═══════════════════════════════════════ */
 const firebaseConfig={apiKey:"AIzaSyDYR5F3tPBCQgFlftpGa7DnvIHb2pXZ4_Y",authDomain:"todooo-e2420.firebaseapp.com",projectId:"todooo-e2420",storageBucket:"todooo-e2420.firebasestorage.app",messagingSenderId:"644820241408",appId:"1:644820241408:web:d16cdd7b73e75833109ce5"};
 firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore(),auth=firebase.auth(),provider=new firebase.auth.GoogleAuthProvider();
@@ -210,67 +387,45 @@ let DOC_REF=null,saveTimer=null;
 
 /* ─── STATE ─── */
 let S={
-  tasks:[],       // {id,folderId,done,prio,pc,title,note,mins,now,today,order}
-  folders:[],     // {id,name,order,doneOpen}
+  tasks:[],
+  folders:[],
+  tags:[],        // {id, name, order}
   deadline:null,
   nextId:100,
-  nextFolderId:10
+  nextFolderId:10,
+  nextTagId:1
 };
+
+let selectedTags=new Set(); // for filtering
+let tagsOpen=true;
 
 /* ─── AUTH ─── */
 const isEmbeddedBrowser=(function(){
   const ua=navigator.userAgent||navigator.vendor||'';
-  return /TelegramBot|Telegram|Tg\//i.test(ua)||
-         /FBAN|FBAV|FB_IAB/i.test(ua)||
-         /Instagram/i.test(ua)||
-         /Line\//i.test(ua)||
-         /MicroMessenger/i.test(ua)||
-         (!/Chrome|Safari|Firefox|Edge/i.test(ua)&&/Mobile/i.test(ua));
+  return /TelegramBot|Telegram|Tg\//i.test(ua)||/FBAN|FBAV|FB_IAB/i.test(ua)||/Instagram/i.test(ua)||/Line\//i.test(ua)||/MicroMessenger/i.test(ua)||(!/Chrome|Safari|Firefox|Edge/i.test(ua)&&/Mobile/i.test(ua));
 })();
 
-// Handle redirect result (when returning from Google after signInWithRedirect)
 auth.getRedirectResult().then(result=>{
   if(result&&result.user)console.log("Redirect login OK:",result.user.email);
 }).catch(e=>{
   console.error("Redirect error:",e);
-  if(e.code!=='auth/credential-already-in-use'&&e.code!=='auth/popup-closed-by-user'){
-    alert("Login помилка: "+e.message);
-  }
+  if(e.code!=='auth/credential-already-in-use'&&e.code!=='auth/popup-closed-by-user')alert("Login помилка: "+e.message);
 });
 
 function googleLogin(){
-  if(isEmbeddedBrowser){
-    // Show fallback immediately
-    showTgFallback();
-    return;
-  }
-  // Normal browser: popup first, redirect fallback
+  if(isEmbeddedBrowser){showTgFallback();return}
   auth.signInWithPopup(provider).catch(e=>{
     console.warn("Popup failed, trying redirect:",e.code);
-    if(e.code==='auth/popup-blocked'||e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'){
-      auth.signInWithRedirect(provider);
-    }else{
-      alert("Login помилка: "+e.message);
-    }
+    if(e.code==='auth/popup-blocked'||e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request')auth.signInWithRedirect(provider);
+    else alert("Login помилка: "+e.message);
   });
 }
-
 function showTgFallback(){
-  const btn=document.getElementById("googleBtn");
-  const fb=document.getElementById("tgFallback");
+  const btn=document.getElementById("googleBtn"),fb=document.getElementById("tgFallback");
   if(btn)btn.style.display="none";
-  if(fb){
-    fb.style.display="flex";
-    document.getElementById("openBrowserBtn").href=window.location.href;
-  }
+  if(fb){fb.style.display="flex";document.getElementById("openBrowserBtn").href=window.location.href}
 }
-
-// Auto-detect embedded browser on load → show fallback right away
-if(isEmbeddedBrowser){
-  window.addEventListener('DOMContentLoaded',showTgFallback);
-  // Also try immediately in case DOMContentLoaded already fired
-  if(document.readyState!=='loading')showTgFallback();
-}
+if(isEmbeddedBrowser){window.addEventListener('DOMContentLoaded',showTgFallback);if(document.readyState!=='loading')showTgFallback()}
 
 function logout(){auth.signOut()}
 auth.onAuthStateChanged(u=>{
@@ -284,8 +439,9 @@ auth.onAuthStateChanged(u=>{
   }else{
     document.getElementById("loginScreen").style.display="flex";
     document.getElementById("mainApp").style.display="none";
-    DOC_REF=null;S.tasks=[];S.folders=[];
+    DOC_REF=null;S.tasks=[];S.folders=[];S.tags=[];
   }
+  applyI18n();
 });
 
 /* ─── SYNC ─── */
@@ -293,7 +449,7 @@ function syncSt(s,m){const el=document.getElementById("syncStatus");el.textConte
 function save(){
   if(!DOC_REF)return;clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>{
-    DOC_REF.set({tasks:S.tasks,folders:S.folders,deadline:S.deadline,nextId:S.nextId,nextFolderId:S.nextFolderId})
+    DOC_REF.set({tasks:S.tasks,folders:S.folders,tags:S.tags||[],deadline:S.deadline,nextId:S.nextId,nextFolderId:S.nextFolderId,nextTagId:S.nextTagId||1})
     .then(()=>syncSt("ok","☁️")).catch(e=>{console.error(e);syncSt("err","⚠️")});
   },400);
 }
@@ -303,20 +459,17 @@ async function loadFromCloud(){
     const snap=await DOC_REF.get();
     if(snap.exists){
       const d=snap.data();
-      S.tasks=d.tasks||[];S.folders=d.folders||[];S.deadline=d.deadline||null;
-      S.nextId=d.nextId||100;S.nextFolderId=d.nextFolderId||10;
-      // migrate: if no folders exist but tasks do, create default
-      if(!S.folders.length&&S.tasks.length){
-        S.folders=[{id:1,name:"Завдання",order:0,doneOpen:false}];
-        S.tasks.forEach(t=>{if(!t.folderId)t.folderId=1});
-      }
+      S.tasks=d.tasks||[];S.folders=d.folders||[];S.tags=d.tags||[];S.deadline=d.deadline||null;
+      S.nextId=d.nextId||100;S.nextFolderId=d.nextFolderId||10;S.nextTagId=d.nextTagId||1;
+      if(!S.folders.length&&S.tasks.length){S.folders=[{id:1,name:"Завдання",order:0,doneOpen:false}];S.tasks.forEach(t=>{if(!t.folderId)t.folderId=1})}
       if(!S.folders.length)S.folders=[{id:1,name:"Завдання",order:0,doneOpen:false}];
-      // migrate old tasks
       S.tasks.forEach(t=>{
         if(t.folderId===undefined)t.folderId=S.folders[0].id;
         if(t.today===undefined)t.today=false;
         if(t.order===undefined)t.order=0;
+        if(!t.tags)t.tags=[];
       });
+      S.folders.forEach(f=>{if(f.collapsed===undefined)f.collapsed=false});
       if(S.deadline){
         const dt=new Date(S.deadline),p=n=>String(n).padStart(2,'0');
         document.getElementById("deadline").value=dt.getFullYear()+'-'+p(dt.getMonth()+1)+'-'+p(dt.getDate())+'T'+p(dt.getHours())+':'+p(dt.getMinutes());
@@ -337,231 +490,341 @@ const C={
   gray:{bg:"#F1F0EC",bd:"#8A8985",tx:"#55544F",dbg:"#2C2C2A",dbd:"#B4B2A9",dtx:"#D3D1C7"}
 };
 function gc(c){const v=C[c]||C.gray;return dk?{bg:v.dbg,bd:v.dbd,tx:v.dtx}:{bg:v.bg,bd:v.bd,tx:v.tx}}
-const PRIO_MAP={red:"ТЕРМІНОВО",amber:"ВАЖЛИВО",teal:"СЕРЕДНЄ",gray:"НИЗЬКИЙ"};
-function fm(m){if(!m)return"0 хв";if(m<60)return m+" хв";const h=Math.floor(m/60),r=m%60;return r?h+"г "+r+"хв":h+" год"}
+function getPrioMap(){return{red:t('prioUrgent'),amber:t('prioImportant'),teal:t('prioMedium'),gray:t('prioLow')}}
+function fm(m){if(!m)return"0 "+t('min');if(m<60)return m+" "+t('min');const h=Math.floor(m/60),r=m%60;return r?h+"г "+r+t('min'):h+" год"}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
 /* ─── DEADLINE ─── */
 function setDeadline(){const v=document.getElementById("deadline").value;if(!v)return;S.deadline=new Date(v).getTime();upTL();save()}
 function upTL(){
   const fill=document.getElementById("tlFill"),info=document.getElementById("timeInfo"),lb=document.getElementById("dlLabel");
-  // Only count today-marked undone tasks
   const todayTasks=S.tasks.filter(t=>!t.done&&t.today);
   const tot=todayTasks.reduce((s,t)=>s+(t.mins||0),0);
-  if(!S.deadline){fill.style.width="0%";fill.className="tl-bar-fill";info.innerHTML="Завдань на сьогодні: <b>"+fm(tot)+"</b>";lb.textContent="Не встановлено";return}
+  if(!S.deadline){fill.style.width="0%";fill.className="tl-bar-fill";info.innerHTML=t('tasksToday')+": <b>"+fm(tot)+"</b>";lb.textContent=t('notSet');return}
   const avail=Math.max(0,Math.round((S.deadline-Date.now())/60000));
   const pct=avail>0?Math.min(100,Math.round(tot/avail*100)):100;
   fill.style.width=pct+"%";fill.className="tl-bar-fill "+(pct<=60?"tl-ok":pct<=90?"tl-warn":"tl-over");
-  lb.textContent=new Date(S.deadline).toLocaleString("uk-UA",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+  lb.textContent=new Date(S.deadline).toLocaleString(curLang==='de'?"de-DE":"uk-UA",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
   const fr=avail-tot;
-  info.innerHTML="Доступно: <b>"+fm(avail)+"</b> · Сьогодні: <b>"+fm(tot)+"</b> · "+(fr>=0?"Запас: <b>"+fm(fr)+"</b>":"<span style='color:var(--danger);font-weight:600'>Бракує "+fm(Math.abs(fr))+"</span>");
+  info.innerHTML=t('available')+": <b>"+fm(avail)+"</b> · "+t('todayLabel')+": <b>"+fm(tot)+"</b> · "+(fr>=0?t('reserve')+": <b>"+fm(fr)+"</b>":"<span style='color:var(--danger);font-weight:600'>"+t('missing')+" "+fm(Math.abs(fr))+"</span>");
 }
 
 /* ─── DRAG & DROP ─── */
 let dragTaskId=null,dragGhost=null;
-
 function onDragStart(e,id){
   dragTaskId=id;
-  const t=S.tasks.find(x=>x.id===id);
-  // Create custom ghost
-  dragGhost=document.createElement('div');
-  dragGhost.className='drag-ghost';
-  dragGhost.textContent=t?t.title:'';
-  document.body.appendChild(dragGhost);
-  e.dataTransfer.setDragImage(dragGhost,20,16);
-  e.dataTransfer.effectAllowed='move';
+  const tt=S.tasks.find(x=>x.id===id);
+  dragGhost=document.createElement('div');dragGhost.className='drag-ghost';dragGhost.textContent=tt?tt.title:'';
+  document.body.appendChild(dragGhost);e.dataTransfer.setDragImage(dragGhost,20,16);e.dataTransfer.effectAllowed='move';
   requestAnimationFrame(()=>{e.target.closest('.task')?.classList.add('dragging')});
-  // Show all drop indicators
   document.querySelectorAll('.drop-zone').forEach(z=>z.style.display='flex');
 }
 function onDragEnd(e){
   document.querySelectorAll('.task.dragging').forEach(el=>el.classList.remove('dragging'));
   document.querySelectorAll('.drop-indicator.visible').forEach(el=>el.classList.remove('visible'));
   document.querySelectorAll('.drop-zone.drag-hover').forEach(el=>el.classList.remove('drag-hover'));
-  if(dragGhost){dragGhost.remove();dragGhost=null}
-  dragTaskId=null;
+  if(dragGhost){dragGhost.remove();dragGhost=null}dragTaskId=null;
 }
 function onTaskDragOver(e,targetId){
-  e.preventDefault();e.dataTransfer.dropEffect='move';
-  if(targetId===dragTaskId)return;
-  // Show indicator above this task
+  e.preventDefault();e.dataTransfer.dropEffect='move';if(targetId===dragTaskId)return;
   document.querySelectorAll('.drop-indicator.visible').forEach(el=>el.classList.remove('visible'));
-  const ind=document.querySelector(`.drop-indicator[data-before="${targetId}"]`);
-  if(ind)ind.classList.add('visible');
+  const ind=document.querySelector(`.drop-indicator[data-before="${targetId}"]`);if(ind)ind.classList.add('visible');
 }
 function onTaskDrop(e,targetId){
-  e.preventDefault();
-  document.querySelectorAll('.drop-indicator.visible').forEach(el=>el.classList.remove('visible'));
+  e.preventDefault();document.querySelectorAll('.drop-indicator.visible').forEach(el=>el.classList.remove('visible'));
   if(!dragTaskId||dragTaskId===targetId)return;
-  const target=S.tasks.find(x=>x.id===targetId);
-  const fi=S.tasks.findIndex(x=>x.id===dragTaskId);
-  if(fi<0||!target)return;
-  const item=S.tasks.splice(fi,1)[0];
-  item.folderId=target.folderId;
-  item.now=target.now;
-  const ni=S.tasks.findIndex(x=>x.id===targetId);
-  S.tasks.splice(ni,0,item);
-  render();save();
+  const target=S.tasks.find(x=>x.id===targetId);const fi=S.tasks.findIndex(x=>x.id===dragTaskId);
+  if(fi<0||!target)return;const item=S.tasks.splice(fi,1)[0];
+  item.folderId=target.folderId;item.now=target.now;
+  const ni=S.tasks.findIndex(x=>x.id===targetId);S.tasks.splice(ni,0,item);render();save();
 }
 function onZoneDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';e.currentTarget.classList.add('drag-hover')}
 function onZoneDragLeave(e){e.currentTarget.classList.remove('drag-hover')}
 function onZoneDrop(e,folderId,zone){
-  e.preventDefault();e.currentTarget.classList.remove('drag-hover');
-  if(!dragTaskId)return;
+  e.preventDefault();e.currentTarget.classList.remove('drag-hover');if(!dragTaskId)return;
   const fi=S.tasks.findIndex(x=>x.id===dragTaskId);if(fi<0)return;
-  const item=S.tasks.splice(fi,1)[0];
-  item.folderId=folderId;
-  item.now=zone==='now';
+  const item=S.tasks.splice(fi,1)[0];item.folderId=folderId;item.now=zone==='now';
   if(zone==='now'){
-    // Insert at end of now tasks for this folder
     const lastNow=S.tasks.filter(x=>x.now&&x.folderId===folderId).length;
     const folderStart=S.tasks.findIndex(x=>x.folderId===folderId);
     S.tasks.splice(folderStart<0?S.tasks.length:(folderStart+lastNow),0,item);
   }else{
-    // Insert at end of non-done, non-now tasks in this folder
     let insertIdx=S.tasks.length;
-    const folderTasks=S.tasks.map((t,i)=>({t,i})).filter(x=>x.t.folderId===folderId&&!x.t.now&&!x.t.done);
+    const folderTasks=S.tasks.map((tt,i)=>({tt,i})).filter(x=>x.tt.folderId===folderId&&!x.tt.now&&!x.tt.done);
     if(folderTasks.length)insertIdx=folderTasks[folderTasks.length-1].i+1;
-    else{
-      const anyFolder=S.tasks.map((t,i)=>({t,i})).filter(x=>x.t.folderId===folderId);
-      if(anyFolder.length)insertIdx=anyFolder[anyFolder.length-1].i+1;
-    }
+    else{const any=S.tasks.map((tt,i)=>({tt,i})).filter(x=>x.tt.folderId===folderId);if(any.length)insertIdx=any[any.length-1].i+1}
     S.tasks.splice(insertIdx,0,item);
   }
   render();save();
 }
 function onNowZoneDrop(e){
-  e.preventDefault();e.currentTarget.classList.remove('drag-hover');
-  if(!dragTaskId)return;
+  e.preventDefault();e.currentTarget.classList.remove('drag-hover');if(!dragTaskId)return;
   const fi=S.tasks.findIndex(x=>x.id===dragTaskId);if(fi<0)return;
-  const item=S.tasks.splice(fi,1)[0];
-  item.now=true;
-  // Insert among now tasks
+  const item=S.tasks.splice(fi,1)[0];item.now=true;
   const nowTasks=S.tasks.filter(x=>x.now);
   const insertAt=nowTasks.length?S.tasks.indexOf(nowTasks[nowTasks.length-1])+1:0;
-  S.tasks.splice(insertAt,0,item);
-  render();save();
+  S.tasks.splice(insertAt,0,item);render();save();
 }
 
 /* ─── ACTIONS ─── */
-function tog(id){const t=S.tasks.find(x=>x.id===id);if(t){t.done=!t.done;if(t.done)t.now=false}render();save()}
-function rem(id){if(!confirm("Видалити завдання?"))return;S.tasks=S.tasks.filter(x=>x.id!==id);render();save()}
-function setNow(id){const t=S.tasks.find(x=>x.id===id);if(!t)return;t.now=!t.now;if(t.now)t.done=false;
-  // Move to correct position
-  const fi=S.tasks.findIndex(x=>x.id===id);
-  S.tasks.splice(fi,1);
-  if(t.now){
-    const nowTasks=S.tasks.filter(x=>x.now);
-    const insertAt=nowTasks.length?S.tasks.indexOf(nowTasks[nowTasks.length-1])+1:0;
-    S.tasks.splice(insertAt,0,t);
-  }else{
-    // Put back in folder
-    const folderTasks=S.tasks.filter(x=>x.folderId===t.folderId&&!x.now&&!x.done);
-    if(folderTasks.length){
-      S.tasks.splice(S.tasks.indexOf(folderTasks[folderTasks.length-1])+1,0,t);
-    }else S.tasks.push(t);
-  }
+function tog(id){const tt=S.tasks.find(x=>x.id===id);if(tt){tt.done=!tt.done;if(tt.done)tt.now=false}render();save()}
+function rem(id){if(!confirm(t('deleteTask')))return;S.tasks=S.tasks.filter(x=>x.id!==id);render();save()}
+function setNow(id){
+  const tt=S.tasks.find(x=>x.id===id);if(!tt)return;tt.now=!tt.now;if(tt.now)tt.done=false;
+  const fi=S.tasks.findIndex(x=>x.id===id);S.tasks.splice(fi,1);
+  if(tt.now){const nowTasks=S.tasks.filter(x=>x.now);const insertAt=nowTasks.length?S.tasks.indexOf(nowTasks[nowTasks.length-1])+1:0;S.tasks.splice(insertAt,0,tt)}
+  else{const folderTasks=S.tasks.filter(x=>x.folderId===tt.folderId&&!x.now&&!x.done);if(folderTasks.length)S.tasks.splice(S.tasks.indexOf(folderTasks[folderTasks.length-1])+1,0,tt);else S.tasks.push(tt)}
   render();save();
 }
-function setToday(id){const t=S.tasks.find(x=>x.id===id);if(t){t.today=!t.today}render();save()}
-function setMins(id,v){const t=S.tasks.find(x=>x.id===id);if(t)t.mins=Math.max(0,parseInt(v)||0);upTL();save()}
+function setToday(id){const tt=S.tasks.find(x=>x.id===id);if(tt){tt.today=!tt.today}render();save()}
+function setMins(id,v){const tt=S.tasks.find(x=>x.id===id);if(tt)tt.mins=Math.max(0,parseInt(v)||0);upTL();save()}
 function setPrio(id,pc){
-  const t=S.tasks.find(x=>x.id===id);if(!t)return;
-  t.pc=pc;t.prio=PRIO_MAP[pc]||'НИЗЬКИЙ';render();save();
+  const tt=S.tasks.find(x=>x.id===id);if(!tt)return;
+  tt.pc=pc;tt.prio=getPrioMap()[pc]||t('prioLow');closeAllPopups();render();save();
 }
-function setTitle(id,v){const t=S.tasks.find(x=>x.id===id);if(t)t.title=v;save()}
-function setNote(id,v){const t=S.tasks.find(x=>x.id===id);if(t)t.note=v;save()}
+function setTitle(id,v){const tt=S.tasks.find(x=>x.id===id);if(tt)tt.title=v;save()}
+function setNote(id,v){const tt=S.tasks.find(x=>x.id===id);if(tt)tt.note=v;save()}
+
+/* ─── MOVE TASK TO FOLDER ─── */
+function moveTaskToFolder(taskId,folderId){
+  const tt=S.tasks.find(x=>x.id===taskId);if(!tt||tt.folderId===folderId)return;
+  tt.folderId=folderId;tt.now=false;closeAllPopups();render();save();
+}
+
+/* ─── POPUPS ─── */
+let openPopupId=null;
+function closeAllPopups(){
+  document.querySelectorAll('.prio-dropdown.open,.folder-popup.open,.tag-add-popup.open').forEach(p=>p.classList.remove('open'));
+  document.querySelectorAll('.popup-overlay').forEach(o=>o.remove());
+  openPopupId=null;
+}
+function openPopup(el){
+  closeAllPopups();
+  el.classList.add('open');
+  openPopupId=el.id;
+  const ov=document.createElement('div');ov.className='popup-overlay';ov.onclick=closeAllPopups;
+  document.body.appendChild(ov);
+}
+function togglePrio(taskId){
+  const el=document.getElementById('prioDd_'+taskId);
+  if(!el)return;
+  if(el.classList.contains('open'))closeAllPopups();else openPopup(el);
+}
+function toggleFolderPopup(taskId){
+  const el=document.getElementById('folderPop_'+taskId);
+  if(!el)return;
+  if(el.classList.contains('open'))closeAllPopups();else openPopup(el);
+}
+function toggleTagPopup(taskId){
+  const el=document.getElementById('tagPop_'+taskId);
+  if(!el)return;
+  if(el.classList.contains('open'))closeAllPopups();else openPopup(el);
+}
+
+/* ─── TAGS ─── */
+function addTag(name){
+  name=name.trim();if(!name)return;
+  if(S.tags.find(tg=>tg.name.toLowerCase()===name.toLowerCase()))return;
+  S.tags.push({id:S.nextTagId++,name,order:S.tags.length});render();save();
+}
+function removeTag(tagId){
+  if(!confirm(t('deleteTag')))return;
+  S.tags=S.tags.filter(tg=>tg.id!==tagId);
+  S.tasks.forEach(tt=>{if(tt.tags)tt.tags=tt.tags.filter(tid=>tid!==tagId)});
+  selectedTags.delete(tagId);render();save();
+}
+function toggleTagOnTask(taskId,tagId){
+  const tt=S.tasks.find(x=>x.id===taskId);if(!tt)return;
+  if(!tt.tags)tt.tags=[];
+  const idx=tt.tags.indexOf(tagId);
+  if(idx>=0)tt.tags.splice(idx,1);else tt.tags.push(tagId);
+  render();save();
+}
+function toggleTagFilter(tagId){
+  if(selectedTags.has(tagId))selectedTags.delete(tagId);else selectedTags.add(tagId);
+  render();
+}
+function toggleTagsPanel(){
+  tagsOpen=!tagsOpen;render();
+}
+function taskMatchesTagFilter(tt){
+  if(selectedTags.size===0)return true;
+  if(!tt.tags||!tt.tags.length)return false;
+  for(const tid of selectedTags){if(!tt.tags.includes(tid))return false}
+  return true;
+}
+
+/* ─── TAG DRAG IN PANEL ─── */
+let dragTagId=null;
+function onTagDragStart(e,tagId){
+  dragTagId=tagId;e.dataTransfer.effectAllowed='move';
+  e.target.classList.add('dragging-tag');
+}
+function onTagDragEnd(e){
+  e.target.classList.remove('dragging-tag');dragTagId=null;
+}
+function onTagDragOver(e,tagId){
+  e.preventDefault();if(tagId===dragTagId)return;
+}
+function onTagDrop(e,tagId){
+  e.preventDefault();if(!dragTagId||dragTagId===tagId)return;
+  const fromIdx=S.tags.findIndex(tg=>tg.id===dragTagId);
+  const toIdx=S.tags.findIndex(tg=>tg.id===tagId);
+  if(fromIdx<0||toIdx<0)return;
+  const item=S.tags.splice(fromIdx,1)[0];
+  S.tags.splice(toIdx,0,item);
+  S.tags.forEach((tg,i)=>tg.order=i);
+  dragTagId=null;render();save();
+}
 
 /* ─── FOLDERS ─── */
 function addFolder(){
-  const name=prompt("Назва папки:");if(!name?.trim())return;
-  S.folders.push({id:S.nextFolderId++,name:name.trim(),order:S.folders.length,doneOpen:false});
+  const name=prompt(t('folderNamePrompt'));if(!name?.trim())return;
+  S.folders.push({id:S.nextFolderId++,name:name.trim(),order:S.folders.length,doneOpen:false,collapsed:false});
   render();save();
 }
-function renameFolder(fid,el){
-  const f=S.folders.find(x=>x.id===fid);if(!f)return;
-  f.name=el.value.trim()||f.name;save();
-}
+function renameFolder(fid,el){const f=S.folders.find(x=>x.id===fid);if(!f)return;f.name=el.value.trim()||f.name;save()}
 function removeFolder(fid){
-  if(S.folders.length<=1){alert("Потрібна хоча б одна папка");return}
-  if(!confirm("Видалити папку та всі завдання в ній?"))return;
-  S.tasks=S.tasks.filter(t=>t.folderId!==fid);
-  S.folders=S.folders.filter(f=>f.id!==fid);
-  render();save();
+  if(S.folders.length<=1){alert(t('needOneFolder'));return}
+  if(!confirm(t('deleteFolder')))return;
+  S.tasks=S.tasks.filter(tt=>tt.folderId!==fid);S.folders=S.folders.filter(f=>f.id!==fid);render();save();
+}
+function toggleFolder(fid){
+  const f=S.folders.find(x=>x.id===fid);if(f)f.collapsed=!f.collapsed;render();save();
 }
 function toggleDone(fid){
   const f=S.folders.find(x=>x.id===fid);if(f)f.doneOpen=!f.doneOpen;render();save();
 }
 function addTaskInFolder(fid){
-  const inp=document.getElementById('addInp_'+fid);
-  const v=inp?.value.trim();if(!v)return;
-  S.tasks.push({id:S.nextId++,folderId:fid,done:false,prio:"НОВЕ",pc:"gray",title:v,note:"",mins:0,now:false,today:false});
+  const inp=document.getElementById('addInp_'+fid);const v=inp?.value.trim();if(!v)return;
+  S.tasks.push({id:S.nextId++,folderId:fid,done:false,prio:t('prioNew'),pc:"gray",title:v,note:"",mins:0,now:false,today:false,tags:[]});
   inp.value="";render();save();
 }
 
 /* ─── RENDER ─── */
-function taskHTML(t){
-  const c=gc(t.pc);
-  const isDone=t.done;
+function taskHTML(tt){
+  const c=gc(tt.pc);
+  const isDone=tt.done;
+  const folder=S.folders.find(f=>f.id===tt.folderId);
+  const folderName=folder?esc(folder.name):'?';
+  const prioLabel=getPrioMap()[tt.pc]||tt.prio||t('prioLow');
+
+  // Task tags HTML
+  let tagsHtml='';
+  if(tt.tags&&tt.tags.length){
+    tagsHtml=tt.tags.map(tid=>{
+      const tg=S.tags.find(x=>x.id===tid);
+      if(!tg)return'';
+      return `<span class="task-tag"><span>${esc(tg.name)}</span><span class="ttag-rm" onclick="event.stopPropagation();toggleTagOnTask(${tt.id},${tid})">&times;</span></span>`;
+    }).join('');
+  }
+
+  // Folder options HTML for popup
+  let folderOpts=S.folders.map(f=>`<div class="folder-popup-opt${f.id===tt.folderId?' current':''}" onclick="event.stopPropagation();moveTaskToFolder(${tt.id},${f.id})">${esc(f.name)}</div>`).join('');
+
+  // Prio options HTML
+  const prioOpts=[
+    {pc:'red',label:t('prioUrgentL')},
+    {pc:'amber',label:t('prioImportantL')},
+    {pc:'teal',label:t('prioMediumL')},
+    {pc:'gray',label:t('prioLowL')}
+  ].map(p=>`<div class="prio-opt" onclick="event.stopPropagation();setPrio(${tt.id},'${p.pc}')">${p.label}</div>`).join('');
+
+  // Tag popup HTML
+  let tagPopOpts=S.tags.map(tg=>{
+    const has=tt.tags&&tt.tags.includes(tg.id);
+    return `<div class="tag-add-opt" onclick="event.stopPropagation();toggleTagOnTask(${tt.id},${tg.id})">${has?'<span class="check">✓</span>':'<span style="width:14px;display:inline-block"></span>'} ${esc(tg.name)}</div>`;
+  }).join('');
+
   return `
-  <div class="drop-indicator" data-before="${t.id}"></div>
-  <div class="task${isDone?' done-task':''}" data-id="${t.id}" draggable="true"
-    ondragstart="onDragStart(event,${t.id})" ondragend="onDragEnd(event)"
-    ondragover="onTaskDragOver(event,${t.id})" ondrop="onTaskDrop(event,${t.id})">
-    <input type="checkbox" class="task-cb" ${isDone?"checked":""} onchange="tog(${t.id})"/>
+  <div class="drop-indicator" data-before="${tt.id}"></div>
+  <div class="task${isDone?' done-task':''}" data-id="${tt.id}" draggable="true"
+    ondragstart="onDragStart(event,${tt.id})" ondragend="onDragEnd(event)"
+    ondragover="onTaskDragOver(event,${tt.id})" ondrop="onTaskDrop(event,${tt.id})">
+    <input type="checkbox" class="task-cb" ${isDone?"checked":""} onchange="tog(${tt.id})"/>
+    ${!isDone?`<div class="task-left-btns">
+      <button class="task-left-btn now-l${tt.now?' active':''}" onclick="setNow(${tt.id})" title="${t('now')}">⚡${t('now')}</button>
+      <button class="task-left-btn today-l${tt.today?' active':''}" onclick="setToday(${tt.id})" title="${t('today')}">📅${t('today')}</button>
+    </div>`:''}
     <div class="task-main">
-      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-        <span class="badge" style="background:${c.bg};color:${c.tx};border-color:${c.bd}">${esc(t.prio)}</span>
-        ${t.today?'<span style="font-size:10px;color:var(--warn);font-weight:600">📅 сьогодні</span>':''}
-        <input type="text" class="task-title${isDone?' strike':''}" value="${esc(t.title)}"
-          onchange="setTitle(${t.id},this.value)" onfocus="this.select()"/>
+      <div class="task-title-row">
+        <div class="prio-badge-wrap">
+          <span class="prio-badge" style="background:${c.bg};color:${c.tx};border-color:${c.bd}" onclick="event.stopPropagation();togglePrio(${tt.id})">${esc(prioLabel)}</span>
+          <div class="prio-dropdown" id="prioDd_${tt.id}">${prioOpts}</div>
+        </div>
+        ${tt.today&&!tt.now?'<span style="font-size:10px;color:var(--warn);font-weight:600">📅 '+t('today')+'</span>':''}
+        <input type="text" class="task-title${isDone?' strike':''}" value="${esc(tt.title)}"
+          onchange="setTitle(${tt.id},this.value)" onfocus="this.select()"/>
       </div>
-      <textarea class="task-note" rows="1" placeholder="нотатка…"
-        oninput="autoGrow(this)" onchange="setNote(${t.id},this.value)"
-        onfocus="autoGrow(this)">${esc(t.note)}</textarea>
+      <textarea class="task-note" rows="1" placeholder="…"
+        oninput="autoGrow(this)" onchange="setNote(${tt.id},this.value)"
+        onfocus="autoGrow(this)">${esc(tt.note)}</textarea>
       <div class="task-row">
-        <input type="number" class="dur-input" value="${t.mins||0}" min="0" step="5" onchange="setMins(${t.id},this.value)"/>
-        <span class="dur-label">хв</span>
-        <select class="prio-select" onchange="setPrio(${t.id},this.value)">
-          <option value="red" ${t.pc==='red'?'selected':''}>🔴 Терміново</option>
-          <option value="amber" ${t.pc==='amber'?'selected':''}>🟠 Важливо</option>
-          <option value="teal" ${t.pc==='teal'?'selected':''}>🟢 Середнє</option>
-          <option value="gray" ${t.pc==='gray'?'selected':''}>⚪ Низький</option>
-        </select>
+        <input type="number" class="dur-input" value="${tt.mins||0}" min="0" step="5" onchange="setMins(${tt.id},this.value)"/>
+        <span class="dur-label">${t('min')}</span>
+        <span style="position:relative;display:inline-flex">
+          <span class="folder-label" onclick="event.stopPropagation();toggleFolderPopup(${tt.id})">📁 ${folderName}</span>
+          <div class="folder-popup" id="folderPop_${tt.id}">${folderOpts}</div>
+        </span>
+        <span style="position:relative;display:inline-flex">
+          <span class="folder-label" onclick="event.stopPropagation();toggleTagPopup(${tt.id})">${t('tagLabel')}+</span>
+          <div class="tag-add-popup" id="tagPop_${tt.id}">${tagPopOpts}${S.tags.length===0?'<div style="padding:6px 12px;font-size:11px;color:var(--tx3)">—</div>':''}</div>
+        </span>
+        ${tagsHtml}
       </div>
     </div>
     <div class="task-actions">
-      ${!isDone?`<button class="act-btn now-btn" onclick="setNow(${t.id})" title="Зараз">${t.now?'✦ зараз':'⚡ зараз'}</button>`:''}
-      ${!isDone?`<button class="act-btn today-btn${t.today?' active':''}" onclick="setToday(${t.id})" title="Сьогодні">📅</button>`:''}
-      <button class="del-btn" onclick="rem(${t.id})" title="Видалити">&times;</button>
+      <button class="del-btn" onclick="rem(${tt.id})" title="×">&times;</button>
     </div>
   </div>`;
 }
 
 function render(){
+  applyI18n();
+  
+  // ─── TAGS PANEL ───
+  const tagsBody=document.getElementById("tagsBody");
+  const tagsChevron=document.getElementById("tagsChevron");
+  document.getElementById("tagsCount").textContent=S.tags.length;
+  if(tagsChevron)tagsChevron.classList.toggle('open',tagsOpen);
+  if(tagsBody){
+    if(!tagsOpen){tagsBody.style.display='none'}
+    else{
+      tagsBody.style.display='flex';
+      let th=S.tags.map(tg=>`<span class="tag-chip${selectedTags.has(tg.id)?' selected':''}"
+        draggable="true" ondragstart="onTagDragStart(event,${tg.id})" ondragend="onTagDragEnd(event)"
+        ondragover="onTagDragOver(event,${tg.id})" ondrop="onTagDrop(event,${tg.id})"
+        onclick="toggleTagFilter(${tg.id})">
+        ${esc(tg.name)}<span class="tag-rm" onclick="event.stopPropagation();removeTag(${tg.id})">&times;</span>
+      </span>`).join('');
+      th+=`<input type="text" class="add-tag-input" placeholder="${t('addTagPh')}" onkeydown="if(event.key==='Enter'){addTag(this.value);this.value=''}"/>`;
+      tagsBody.innerHTML=th;
+    }
+  }
+
   // ─── NOW zone ───
   const nowEl=document.getElementById("nowZone");
-  const nowTasks=S.tasks.filter(t=>t.now&&!t.done);
+  const nowTasks=S.tasks.filter(tt=>tt.now&&!tt.done&&taskMatchesTagFilter(tt));
   if(nowTasks.length){
     let h=`<div class="folder" style="border-color:var(--accent-bd);margin-bottom:12px">
       <div class="now-header">
         <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8.5 1L3 9.5h4.5L7 15l6-8.5H8.5L9 1z" fill="currentColor"/></svg>
-        Зараз <span class="folder-count">${nowTasks.length}</span>
+        ${t('now')} <span class="folder-count">${nowTasks.length}</span>
       </div>
       <div class="folder-body">`;
     h+=nowTasks.map(taskHTML).join("");
     h+=`<div class="drop-zone" ondragover="onZoneDragOver(event)" ondragleave="onZoneDragLeave(event)"
-          ondrop="onNowZoneDrop(event)">⚡ Перетягни сюди</div>`;
+          ondrop="onNowZoneDrop(event)">⚡ ${t('dragHere')}</div>`;
     h+=`</div></div>`;
     nowEl.innerHTML=h;
   }else{
     nowEl.innerHTML=`<div class="folder" style="border-color:var(--accent-bd);margin-bottom:12px;opacity:.5">
       <div class="now-header">
         <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8.5 1L3 9.5h4.5L7 15l6-8.5H8.5L9 1z" fill="currentColor"/></svg>
-        Зараз
+        ${t('now')}
       </div>
       <div class="drop-zone" ondragover="onZoneDragOver(event)" ondragleave="onZoneDragLeave(event)"
-        ondrop="onNowZoneDrop(event)" style="margin:6px 10px">Перетягни завдання сюди</div>
+        ondrop="onNowZoneDrop(event)" style="margin:6px 10px">${t('dragTaskHere')}</div>
     </div>`;
   }
 
@@ -569,41 +832,44 @@ function render(){
   const fc=document.getElementById("foldersContainer");
   let fhtml='';
   for(const folder of S.folders){
-    const fTasks=S.tasks.filter(t=>t.folderId===folder.id&&!t.now&&!t.done);
-    const doneTasks=S.tasks.filter(t=>t.folderId===folder.id&&t.done);
-    const total=S.tasks.filter(t=>t.folderId===folder.id).length;
-    
+    const allFolderTasks=S.tasks.filter(tt=>tt.folderId===folder.id);
+    const fTasks=allFolderTasks.filter(tt=>!tt.now&&!tt.done&&taskMatchesTagFilter(tt));
+    const doneTasks=allFolderTasks.filter(tt=>tt.done&&taskMatchesTagFilter(tt));
+    const total=allFolderTasks.length;
+    const collapsed=folder.collapsed;
+
     fhtml+=`<div class="folder">
-      <div class="folder-head">
-        <input class="folder-name" value="${esc(folder.name)}" onchange="renameFolder(${folder.id},this)" onfocus="this.select()"/>
+      <div class="folder-head" onclick="toggleFolder(${folder.id})">
+        <svg class="folder-chevron${collapsed?'':' open'}" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg>
+        <input class="folder-name" value="${esc(folder.name)}" onchange="renameFolder(${folder.id},this)" onfocus="this.select()" onclick="event.stopPropagation()"/>
         <span class="folder-count">${total}</span>
-        <button class="folder-btn" onclick="removeFolder(${folder.id})" title="Видалити папку">🗑</button>
+        <button class="folder-btn" onclick="event.stopPropagation();removeFolder(${folder.id})" title="🗑">🗑</button>
       </div>
-      <div class="folder-body">`;
+      <div class="folder-body${collapsed?' collapsed':''}" style="${collapsed?'':'max-height:9999px'}">`;
 
     if(fTasks.length){
       fhtml+=fTasks.map(taskHTML).join("");
     }
     
     fhtml+=`<div class="drop-zone" ondragover="onZoneDragOver(event)" ondragleave="onZoneDragLeave(event)"
-      ondrop="onZoneDrop(event,${folder.id},'rest')">Перетягни сюди</div>`;
+      ondrop="onZoneDrop(event,${folder.id},'rest')">${t('dragHere')}</div>`;
     fhtml+=`</div>`;
 
     // Done section
     if(doneTasks.length){
-      fhtml+=`<div class="done-section">
+      fhtml+=`<div class="done-section${collapsed?' collapsed':''}">
         <div class="done-toggle${folder.doneOpen?' open':''}" onclick="toggleDone(${folder.id})">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg>
-          Зроблені (${doneTasks.length})
+          ${t('done')} (${doneTasks.length})
         </div>
         <div class="done-tasks${folder.doneOpen?' open':''}">`;
       fhtml+=doneTasks.map(taskHTML).join("");
       fhtml+=`</div></div>`;
     }
 
-    // Add task input
+    // Add task input (always visible, even when collapsed)
     fhtml+=`<div class="add-task-row">
-      <input type="text" class="add-task-input" id="addInp_${folder.id}" placeholder="Нове завдання…"
+      <input type="text" class="add-task-input" id="addInp_${folder.id}" placeholder="${t('newTaskPh')}"
         onkeydown="if(event.key==='Enter')addTaskInFolder(${folder.id})"/>
       <button class="add-task-btn" onclick="addTaskInFolder(${folder.id})">+</button>
     </div>`;
@@ -613,19 +879,16 @@ function render(){
   fc.innerHTML=fhtml;
 
   // Stats
-  const dn=S.tasks.filter(t=>t.done).length;
-  const todayC=S.tasks.filter(t=>t.today&&!t.done).length;
-  document.getElementById("stats").textContent=dn+" з "+S.tasks.length+" зроблено · "+todayC+" на сьогодні";
+  const dn=S.tasks.filter(tt=>tt.done).length;
+  const todayC=S.tasks.filter(tt=>tt.today&&!tt.done).length;
+  document.getElementById("stats").textContent=dn+" "+t('of')+" "+S.tasks.length+" "+t('doneLabel')+" · "+todayC+" "+t('forToday');
   
   upTL();
-  // Auto-grow textareas
   document.querySelectorAll('.task-note').forEach(autoGrow);
 }
 
 function autoGrow(el){
-  if(!el)return;
-  el.style.height='auto';
-  el.style.height=Math.max(18,el.scrollHeight)+'px';
+  if(!el)return;el.style.height='auto';el.style.height=Math.max(18,el.scrollHeight)+'px';
 }
 </script>
 </body>
