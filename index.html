@@ -130,13 +130,14 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .folder-desc{font-size:11px;width:100%;border:none;background:none;color:var(--tx2);font-family:var(--font);padding:3px 10px 4px;outline:none;resize:none;cursor:text;line-height:1.3;border-bottom:1px solid var(--bd3)}
 .folder-desc:focus{background:var(--bg2);color:var(--tx1)}
 .folder-count{font-size:10px;color:var(--tx2);background:var(--bg3);padding:0 6px;border-radius:8px}
-.folder-btn{padding:4px 6px;border-radius:var(--btn-rad);color:var(--tx2);font-size:20px;transition:all .15s}
+.folder-btn{padding:4px 6px;border-radius:var(--btn-rad);color:var(--tx2);font-size:18px;transition:all .15s;line-height:1}
 .folder-btn:hover{background:var(--bg3);color:var(--tx0)}
-.folder-copy-btn{padding:4px 6px;border-radius:var(--btn-rad);color:var(--tx2);font-size:18px;transition:all .15s;position:relative}
+.folder-copy-btn{padding:4px 6px;border-radius:var(--btn-rad);color:var(--tx2);font-size:18px;transition:all .15s;position:relative;line-height:1}
 .copy-ok{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:9px;background:var(--accent);color:#fff;padding:1px 6px;border-radius:3px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .3s}
 .copy-ok.show{opacity:1}
 .folder-body{padding:2px 0;transition:max-height .3s ease,opacity .2s;overflow:visible}
 .folder-body.collapsed{max-height:0!important;opacity:0;padding:0;overflow:hidden}
+.folder.inbox-active{border-color:var(--blue-bd)}
 
 /* Task */
 .task{display:flex;gap:6px;align-items:flex-start;padding:5px 10px;border-bottom:1px solid var(--bd3);transition:all .1s;position:relative}
@@ -145,7 +146,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .task.done-task{opacity:.4}
 .task.ref-task{border-left:2px solid var(--accent);padding-left:8px}
 .task.ref-task-today{border-left:2px solid var(--blue);padding-left:8px}
-.task.waiting-task{border-left:2px solid var(--wait);padding-left:8px;opacity:.7}
+.task.waiting-task{border-left:2px solid var(--wait);padding-left:8px;opacity:.7;background:var(--wait-bg)}
 .task-cb{margin-top:2px;width:18px;height:18px;cursor:pointer;accent-color:var(--accent);flex-shrink:0}
 .task-main{flex:1;min-width:0}
 .task-top-btns{display:flex;flex-direction:row;gap:3px;margin-bottom:2px;align-items:center;flex-wrap:wrap}
@@ -170,12 +171,15 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 
 /* Subtasks */
 .subtasks-wrap{margin-top:3px}
-.subtask{display:flex;align-items:flex-start;gap:5px;padding:2px 0;font-size:13px}
-.subtask-cb{width:16px;height:16px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;margin-top:2px}
+.subtask{display:flex;flex-direction:column;gap:1px;padding:3px 0;font-size:13px;border-bottom:1px solid var(--bd3)}
+.subtask:last-child{border-bottom:none}
+.subtask-date-row{display:flex;align-items:center;gap:5px}
+.subtask-title-row-sub{display:flex;align-items:flex-start;gap:5px;padding-left:21px}
+.subtask-cb{width:16px;height:16px;cursor:pointer;accent-color:var(--accent);flex-shrink:0}
 .subtask-title{flex:1;min-width:0;border:none;background:none;color:var(--tx0);font-family:var(--font);font-size:13px;padding:1px 2px;outline:none;resize:none;overflow:hidden;line-height:1.35;word-wrap:break-word;overflow-wrap:break-word}
 .subtask-title:focus{background:var(--bg2);border-radius:3px}
 .subtask-title.strike{text-decoration:line-through;color:var(--tx2)}
-.subtask-date{width:100px;font-size:10px;padding:0 3px;border:1px solid var(--bd1);border-radius:var(--rad);background:var(--bg1);color:var(--tx0)}
+.subtask-date{width:120px;font-size:11px;padding:1px 3px;border:1px solid var(--bd1);border-radius:var(--rad);background:var(--bg1);color:var(--tx0)}
 .subtask-rm{font-size:14px;color:var(--tx3);cursor:pointer;background:none;border:none;padding:0 3px;align-self:flex-start;margin-top:2px}
 .subtask-rm:hover{color:var(--danger)}
 .add-subtask-btn{font-size:12px;color:var(--tx2);cursor:pointer;background:none;border:1px dashed var(--bd1);border-radius:var(--rad);padding:3px 10px;margin-top:2px}
@@ -350,8 +354,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .focus-fab:hover{border-color:var(--accent);color:var(--accent)}
 .focus-fab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-.subtask{display:flex;align-items:flex-start;gap:5px;padding:2px 0;font-size:13px}
-.subtask-date{width:100px;font-size:10px;flex-shrink:0;align-self:flex-start;margin-top:2px}
+.subtask-date{width:120px;font-size:11px;flex-shrink:0;align-self:center}
 .subtask-date-display{font-size:10px;color:var(--tx2);flex-shrink:0;white-space:nowrap}
 
 /* Subtask today button */
@@ -564,7 +567,7 @@ function setSubtaskDate(taskId,sid,val){const tt=S.tasks.find(x=>x.id===taskId);
 setTimeout(()=>{const titleInput=document.querySelector('.subtask-title[data-sid="'+sid+'"]');if(titleInput)titleInput.focus()},50)}
 function toggleSubtask(taskId,sid){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;pushUndo();const st=tt.subtasks.find(s=>s.id===sid);if(!st)return;st.done=!st.done;st.doneAt=st.done?Date.now():null;logAction(st.done?'subtaskDone':'subtaskUndone',tt.title+' → '+st.title);render();save()}
 function removeSubtask(taskId,sid){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;pushUndo();tt.subtasks=tt.subtasks.filter(s=>s.id!==sid);render();save()}
-function subtasksHTML(tt,editable){if(!tt.subtasks||!tt.subtasks.length)return editable?'<button class="add-subtask-btn" onclick="event.stopPropagation();addSubtask('+tt.id+')">+ підпункт</button>':'';if(!editable)return '';let h='<div class="subtasks-wrap">';h+='<button class="add-subtask-btn" onclick="event.stopPropagation();addSubtask('+tt.id+')">+ підпункт</button>';const undone=tt.subtasks.filter(s=>!s.done).slice().reverse();const done=tt.subtasks.filter(s=>s.done);undone.forEach(st=>{const dateVal=st.date||'';h+='<div class="subtask"><input type="checkbox" class="subtask-cb" onchange="toggleSubtask('+tt.id+','+st.id+')"/><input type="date" class="subtask-date" value="'+dateVal+'" onchange="setSubtaskDate('+tt.id+','+st.id+',this.value)" onclick="event.stopPropagation()" data-sid="'+st.id+'"/><textarea class="subtask-title" data-sid="'+st.id+'" rows="1" placeholder="…" oninput="autoGrow(this)" onchange="setSubtaskTitle('+tt.id+','+st.id+',this.value)" onclick="event.stopPropagation()">'+esc(st.title)+'</textarea><button class="subtask-rm" onclick="event.stopPropagation();removeSubtask('+tt.id+','+st.id+')">×</button></div>'});done.forEach(st=>{h+='<div class="subtask" style="opacity:.5"><input type="checkbox" class="subtask-cb" checked onchange="toggleSubtask('+tt.id+','+st.id+')"/>'+(st.date?'<span class="subtask-date-display">'+st.date+'</span>':'')+'<span class="subtask-title strike">'+esc(st.title)+'</span><button class="subtask-rm" onclick="event.stopPropagation();removeSubtask('+tt.id+','+st.id+')">×</button></div>'});h+='</div>';return h}
+function subtasksHTML(tt,editable){if(!tt.subtasks||!tt.subtasks.length)return editable?'<button class="add-subtask-btn" onclick="event.stopPropagation();addSubtask('+tt.id+')">+ підпункт</button>':'';if(!editable)return '';let h='<div class="subtasks-wrap">';h+='<button class="add-subtask-btn" onclick="event.stopPropagation();addSubtask('+tt.id+')">+ підпункт</button>';const undone=tt.subtasks.filter(s=>!s.done).slice().reverse();const done=tt.subtasks.filter(s=>s.done);undone.forEach(st=>{const dateVal=st.date||'';h+='<div class="subtask"><div class="subtask-date-row"><input type="checkbox" class="subtask-cb" onchange="toggleSubtask('+tt.id+','+st.id+')"/><input type="date" class="subtask-date" value="'+dateVal+'" onchange="setSubtaskDate('+tt.id+','+st.id+',this.value)" onclick="event.stopPropagation()" data-sid="'+st.id+'"/><button class="subtask-rm" onclick="event.stopPropagation();removeSubtask('+tt.id+','+st.id+')">×</button></div><div class="subtask-title-row-sub"><textarea class="subtask-title" data-sid="'+st.id+'" rows="1" placeholder="…" oninput="autoGrow(this)" onchange="setSubtaskTitle('+tt.id+','+st.id+',this.value)" onclick="event.stopPropagation()">'+esc(st.title)+'</textarea></div></div>'});done.forEach(st=>{h+='<div class="subtask" style="opacity:.5"><div class="subtask-date-row"><input type="checkbox" class="subtask-cb" checked onchange="toggleSubtask('+tt.id+','+st.id+')"/>'+(st.date?'<span class="subtask-date-display">'+st.date+'</span>':'')+'<button class="subtask-rm" onclick="event.stopPropagation();removeSubtask('+tt.id+','+st.id+')">×</button></div><div class="subtask-title-row-sub"><span class="subtask-title strike">'+esc(st.title)+'</span></div></div>'});h+='</div>';return h}
 function scrollToFolderTask(id){const container=document.getElementById('foldersContainer');if(!container)return;const el=container.querySelector('.task[data-id="'+id+'"]');if(!el)return;const folder=el.closest('.folder');if(folder){const f=S.folders.find(x=>x.id===parseInt(folder.dataset.folderId));if(f&&f.collapsed){f.collapsed=false;render();setTimeout(()=>scrollToFolderTask(id),100);return}}el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='2px solid var(--accent)';setTimeout(()=>el.style.outline='',1500)}
 
 /* ===== TIMER ===== */
@@ -725,8 +728,11 @@ const doneTasks=all.filter(tt=>tt.done&&taskMatchesTagFilter(tt));
 const undoneCount=all.filter(tt=>!tt.done).length;
 const collapsed=folder.collapsed;
 const icon=folder.icon||'';
+const isInbox=(folder.icon==='📥'||folder.name==='Inbox');
+const inboxHasItems=isInbox&&undoneCount>0;
+const folderHeadStyle=inboxHasItems?'style="background:var(--blue-bg);border-color:var(--blue-bd)"':'';
 fhtml+='<div class="folder-drop-zone" ondragover="onFolderDropZoneDragOver(event)" ondragleave="onFolderDropZoneDragLeave(event)" ondrop="onFolderDrop(event,'+folder.id+')"></div>';
-fhtml+='<div class="folder" data-folder-id="'+folder.id+'"><div class="folder-head" draggable="true" ondragstart="onFolderDragStart(event,'+folder.id+')" ondragend="onFolderDragEnd(event)" onclick="toggleFolder('+folder.id+')"><svg class="folder-chevron'+(collapsed?'':' open')+'" width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg><span class="folder-icon-btn" style="position:relative" onclick="event.stopPropagation();toggleEmojiPicker('+folder.id+')" title="Icon">'+((icon||'📁'))+'<div class="emoji-picker" id="emojiPick_'+folder.id+'">'+EMOJIS.map(e=>'<span class="emoji-pick" onclick="event.stopPropagation();setFolderIcon('+folder.id+',\''+e+'\')">'+e+'</span>').join('')+'<span class="emoji-pick" onclick="event.stopPropagation();setFolderIcon('+folder.id+',\'\')">❌</span></div></span><textarea class="folder-name" rows="1" oninput="autoGrow(this)" onchange="renameFolder('+folder.id+',this)" onfocus="cursorToEnd(this)" onclick="event.stopPropagation()">'+esc(folder.name)+'</textarea><span class="folder-count">'+undoneCount+'</span><button class="folder-copy-btn" onclick="event.stopPropagation();copyFolderTasks('+folder.id+',this)" title="📋">📋<span class="copy-ok">'+t('copied')+'</span></button><button class="folder-btn" onclick="event.stopPropagation();removeFolder('+folder.id+')" title="🗑">🗑</button></div>';
+fhtml+='<div class="folder'+(inboxHasItems?' inbox-active':'')+'" data-folder-id="'+folder.id+'"><div class="folder-head" '+folderHeadStyle+' draggable="true" ondragstart="onFolderDragStart(event,'+folder.id+')" ondragend="onFolderDragEnd(event)" onclick="toggleFolder('+folder.id+')"><svg class="folder-chevron'+(collapsed?'':' open')+'" width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg><span class="folder-icon-btn" style="position:relative" onclick="event.stopPropagation();toggleEmojiPicker('+folder.id+')" title="Icon">'+((icon||'📁'))+'<div class="emoji-picker" id="emojiPick_'+folder.id+'">'+EMOJIS.map(e=>'<span class="emoji-pick" onclick="event.stopPropagation();setFolderIcon('+folder.id+',\''+e+'\')">'+e+'</span>').join('')+'<span class="emoji-pick" onclick="event.stopPropagation();setFolderIcon('+folder.id+',\'\')">❌</span></div></span><textarea class="folder-name" rows="1" oninput="autoGrow(this)" onchange="renameFolder('+folder.id+',this)" onfocus="cursorToEnd(this)" onclick="event.stopPropagation()">'+esc(folder.name)+'</textarea><span class="folder-count"'+(inboxHasItems?' style="background:var(--blue-bg);color:var(--blue)"':'')+'>'+undoneCount+'</span><button class="folder-copy-btn" onclick="event.stopPropagation();copyFolderTasks('+folder.id+',this)" title="📋">📋<span class="copy-ok">'+t('copied')+'</span></button><button class="folder-btn" onclick="event.stopPropagation();removeFolder('+folder.id+')" title="🗑">🗑</button></div>';
 fhtml+='<textarea class="folder-desc" rows="1" placeholder="'+t('folderDescPh')+'" oninput="autoGrow(this)" onchange="setFolderDesc('+folder.id+',this.value)" onfocus="cursorToEnd(this);autoGrow(this)" onclick="event.stopPropagation()">'+esc(folder.desc||'')+'</textarea>';
 fhtml+='<div class="folder-body'+(collapsed?' collapsed':'')+'" style="'+(collapsed?'':'max-height:9999px')+'">';
 if(fTasks.length)fhtml+=fTasks.map(tt=>taskHTML(tt,false)).join("");
