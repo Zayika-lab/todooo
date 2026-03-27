@@ -137,12 +137,14 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .copy-ok.show{opacity:1}
 .folder-body{padding:2px 0;transition:max-height .3s ease,opacity .2s;overflow:visible}
 .folder-body.collapsed{max-height:0!important;opacity:0;padding:0;overflow:hidden}
+.collapsed-hidden{display:none!important}
 .folder.inbox-active{border-color:var(--blue-bd)}
 
 /* Task */
 .task{display:flex;gap:6px;align-items:flex-start;padding:5px 10px;border-bottom:1px solid var(--bd3);transition:all .1s;position:relative}
 .task:last-child{border-bottom:none}
 .task.dragging{opacity:.2;transform:scale(.98)}
+.task textarea,.task input[type=text],.task input[type=number],.task input[type=date]{-webkit-user-select:text;user-select:text}
 .task.done-task{opacity:.4}
 .task.ref-task{border-left:2px solid var(--accent);padding-left:8px}
 .task.ref-task-today{border-left:2px solid var(--blue);padding-left:8px}
@@ -153,7 +155,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .task-left-btn{padding:2px 7px;border-radius:var(--btn-rad);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .1s;border:1px solid transparent;background:none;line-height:1.6}
 .task-left-btn.now-l{color:var(--accent)}
 .task-left-btn.now-l:hover,.task-left-btn.now-l.active{background:var(--accent-bg);border-color:var(--accent-bd)}
-.task-left-btn.today-l{color:var(--tx2);border:1px solid var(--bd1);background:var(--bg2)}
+.task-left-btn.today-l{color:var(--tx2);border:1px solid transparent;background:none}
 .task-left-btn.today-l.active{color:#fff;background:var(--blue);border-color:var(--blue)}
 .task-left-btn.wait-l{color:var(--wait);border:1px solid transparent}
 .task-left-btn.wait-l:hover,.task-left-btn.wait-l.active{background:var(--wait-bg);border-color:var(--wait-bd)}
@@ -180,7 +182,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .subtask-title:focus{background:var(--bg2);border-radius:3px}
 .subtask-title.strike{text-decoration:line-through;color:var(--tx2)}
 .subtask-date{width:120px;font-size:11px;padding:1px 3px;border:1px solid var(--bd1);border-radius:var(--rad);background:var(--bg1);color:var(--tx0)}
-.subtask-rm{font-size:14px;color:var(--tx3);cursor:pointer;background:none;border:none;padding:0 3px;align-self:flex-start;margin-top:2px}
+.subtask-rm{font-size:14px;color:var(--tx3);cursor:pointer;background:none;border:none;padding:0 3px;align-self:center}
 .subtask-rm:hover{color:var(--danger)}
 .add-subtask-btn{font-size:12px;color:var(--tx2);cursor:pointer;background:none;border:1px dashed var(--bd1);border-radius:var(--rad);padding:3px 10px;margin-top:2px}
 .add-subtask-btn:hover{color:var(--accent);border-color:var(--accent)}
@@ -309,9 +311,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .deep-focus .top-bar{display:none!important}
 .deep-focus .fab-group{display:none!important}
 .deep-focus .undo-fab{display:none!important}
-.deep-focus .focus-exit-bar{display:flex!important;align-items:center;justify-content:center;padding:10px;margin-bottom:8px}
-.deep-focus .focus-exit-bar button{padding:6px 20px;border-radius:var(--btn-rad);background:transparent;color:var(--tx3);font-size:11px;font-weight:400;border:1px solid var(--bd1);cursor:pointer;opacity:0.4;transition:opacity .2s}
-.deep-focus .focus-exit-bar button:hover{opacity:0.8}
+.deep-focus .focus-exit-bar{display:none!important}
 .deep-focus .now-section .task-top-btns{display:none!important}
 .deep-focus .now-section .task-actions{display:none!important}
 .deep-focus .now-section .task-row{display:none!important}
@@ -337,10 +337,6 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .task-cb-col{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0}
 .task-scroll-btn{font-size:11px;color:var(--tx3);cursor:pointer;background:none;border:none;padding:0;line-height:1;transition:color .1s}
 .task-scroll-btn:hover{color:var(--accent)}
-
-/* Deep focus: transparent exit button */
-.deep-focus .focus-exit-bar button{background:transparent!important;color:var(--tx3)!important;border:1px solid var(--bd1)!important;font-size:11px!important;font-weight:400!important;opacity:0.4;transition:opacity .2s}
-.deep-focus .focus-exit-bar button:hover{opacity:0.8}
 
 /* Deep focus: show timer controls */
 .deep-focus .now-section .deep-focus-timer{display:flex!important}
@@ -437,6 +433,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
   <!-- Quick add -->
   <div class="quick-add">
     <input type="text" id="quickAddInput" data-i18n-ph="quickAddPh" placeholder="Швидке завдання…" onkeydown="if(event.key==='Enter'){quickAdd()}"/>
+    <select id="quickAddFolder" style="font-size:12px;padding:5px 4px;border-radius:var(--rad-lg);border:1px solid var(--bd1);background:var(--bg1);color:var(--tx0);max-width:120px"></select>
     <button onclick="quickAdd()">+</button>
   </div>
 
@@ -535,7 +532,7 @@ function setFromNow(){const p=n=>String(n).padStart(2,'0');const now=new Date();
 function upTL(){const fill=document.getElementById("tlFill"),info=document.getElementById("timeInfo"),lb=document.getElementById("dlLabel"),fl=document.getElementById("fromLabel2");const todayTasks=S.tasks.filter(t=>!t.done&&t.today&&!t.waiting);const tot=todayTasks.reduce((s,t)=>s+(t.mins||0),0);if(S.timeFrom&&S.timeFrom<Date.now())S.timeFrom=Date.now();fl.textContent=S.timeFrom?new Date(S.timeFrom).toLocaleTimeString(curLang==='de'?'de':'uk',{hour:'2-digit',minute:'2-digit'}):t('nowLabel');if(!S.deadline){fill.style.width="0%";fill.className="tl-bar-fill";info.innerHTML=t('tasksToday')+": <b>"+fm(tot)+"</b>";lb.textContent=t('notSet');return}const from=S.timeFrom||Date.now();const avail=Math.max(0,Math.round((S.deadline-Math.max(from,Date.now()))/60000));const deadlinePassed=S.deadline<Date.now();if(deadlinePassed&&todayTasks.length===0){fill.style.width="100%";fill.className="tl-bar-fill tl-gray";lb.textContent=t('deadlinePassed');info.innerHTML=t('deadlinePassed');return}const pct=avail>0?Math.min(100,Math.round(tot/avail*100)):100;fill.style.width=pct+"%";fill.className="tl-bar-fill "+(deadlinePassed?"tl-gray":pct<=60?"tl-ok":"tl-warn");lb.textContent=new Date(S.deadline).toLocaleString(curLang==='de'?"de-DE":"uk-UA",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});const fr=avail-tot;info.innerHTML=t('available')+": <b>"+fm(avail)+"</b> · "+t('todayLabel')+": <b>"+fm(tot)+"</b> · "+(fr>=0?t('reserve')+": <b>"+fm(fr)+"</b>":"<span style='color:var(--warn);font-weight:600'>"+t('missing')+" "+fm(Math.abs(fr))+"</span>")}
 
 /* ===== QUICK ADD (Inbox) ===== */
-function quickAdd(){const inp=document.getElementById('quickAddInput');const v=inp.value.trim();if(!v)return;pushUndo();let inbox=S.folders.find(f=>f.name==='Inbox'||f.icon==='📥');if(!inbox){inbox={id:S.nextFolderId++,name:'Inbox',order:-1,doneOpen:false,collapsed:false,desc:'',icon:'📥'};S.folders.unshift(inbox)}S.tasks.push({id:S.nextId++,folderId:inbox.id,done:false,prio:t('prioNew'),pc:"gray",title:v,note:"",mins:0,now:false,today:false,tags:[],doneAt:null,waiting:false,waitUntil:null,timerStart:null,timerRunning:false,subtasks:[],nowOrder:0,todayOrder:0});inp.value="";logAction('quickAdd',v);render();save();inp.focus()}
+function quickAdd(){const inp=document.getElementById('quickAddInput');const v=inp.value.trim();if(!v)return;pushUndo();const selFolder=document.getElementById('quickAddFolder');const selFid=selFolder?parseInt(selFolder.value):null;let targetFolder=selFid?S.folders.find(f=>f.id===selFid):null;if(!targetFolder){targetFolder=S.folders.find(f=>f.name==='Inbox'||f.icon==='📥');if(!targetFolder){targetFolder={id:S.nextFolderId++,name:'Inbox',order:-1,doneOpen:false,collapsed:false,desc:'',icon:'📥'};S.folders.unshift(targetFolder)}}S.tasks.push({id:S.nextId++,folderId:targetFolder.id,done:false,prio:t('prioNew'),pc:"gray",title:v,note:"",mins:0,now:false,today:false,tags:[],doneAt:null,waiting:false,waitUntil:null,timerStart:null,timerRunning:false,subtasks:[],nowOrder:0,todayOrder:0});inp.value="";logAction('quickAdd',v);render();save();inp.focus()}
 
 function fabQuickAdd(){const title=prompt(t('quickAddPh'));if(!title||!title.trim())return;pushUndo();let inbox=S.folders.find(f=>f.name==='Inbox'||f.icon==='📥');if(!inbox){inbox={id:S.nextFolderId++,name:'Inbox',order:-1,doneOpen:false,collapsed:false,desc:'',icon:'📥'};S.folders.unshift(inbox)}S.tasks.push({id:S.nextId++,folderId:inbox.id,done:false,prio:t('prioNew'),pc:"gray",title:title.trim(),note:"",mins:0,now:false,today:false,tags:[],doneAt:null,waiting:false,waitUntil:null,timerStart:null,timerRunning:false,subtasks:[],nowOrder:0,todayOrder:0});logAction('quickAdd',title.trim());render();save()}
 
@@ -717,7 +714,7 @@ if(todayTasks.length){let h='<div class="section" style="border-color:var(--blue
 
 // WAITING section
 const waitEl=document.getElementById("waitZone");const waitTasks=S.tasks.filter(tt=>tt.waiting&&!tt.done&&taskMatchesTagFilter(tt)).sort((a,b)=>(a.waitUntil||Infinity)-(b.waitUntil||Infinity));
-if(waitTasks.length){let h='<div class="section" style="border-color:var(--wait-bd)"><div class="section-head" style="color:var(--wait)" onclick="toggleWaitSection()"><svg class="section-chevron'+(waitCollapsed?'':' open')+'" width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg>⏳ '+t('wait')+' <span class="section-count" style="background:var(--wait-bg);color:var(--wait)">'+waitTasks.length+'</span></div><div class="section-body'+(waitCollapsed?' collapsed':'')+'">';h+=waitTasks.map(tt=>taskHTML(tt,true)).join("");h+='</div></div>';waitEl.innerHTML=h}else{waitEl.innerHTML=''}
+if(waitTasks.length){let h='<div class="section" style="border-color:var(--wait-bd);background:var(--wait-bg)"><div class="section-head" style="color:var(--wait)" onclick="toggleWaitSection()"><svg class="section-chevron'+(waitCollapsed?'':' open')+'" width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg>⏳ '+t('wait')+' <span class="section-count" style="background:var(--wait-bg);color:var(--wait)">'+waitTasks.length+'</span></div><div class="section-body'+(waitCollapsed?' collapsed':'')+'">';h+=waitTasks.map(tt=>taskHTML(tt,true)).join("");h+='</div></div>';waitEl.innerHTML=h}else{waitEl.innerHTML=''}
 
 // FOLDERS
 const fc=document.getElementById("foldersContainer");let fhtml='';
@@ -730,15 +727,16 @@ const collapsed=folder.collapsed;
 const icon=folder.icon||'';
 const isInbox=(folder.icon==='📥'||folder.name==='Inbox');
 const inboxHasItems=isInbox&&undoneCount>0;
+if(isInbox&&undoneCount===0)continue;
 const folderHeadStyle=inboxHasItems?'style="background:var(--blue-bg);border-color:var(--blue-bd)"':'';
 fhtml+='<div class="folder-drop-zone" ondragover="onFolderDropZoneDragOver(event)" ondragleave="onFolderDropZoneDragLeave(event)" ondrop="onFolderDrop(event,'+folder.id+')"></div>';
 fhtml+='<div class="folder'+(inboxHasItems?' inbox-active':'')+'" data-folder-id="'+folder.id+'"><div class="folder-head" '+folderHeadStyle+' draggable="true" ondragstart="onFolderDragStart(event,'+folder.id+')" ondragend="onFolderDragEnd(event)" onclick="toggleFolder('+folder.id+')"><svg class="folder-chevron'+(collapsed?'':' open')+'" width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg><span class="folder-icon-btn" style="position:relative" onclick="event.stopPropagation();toggleEmojiPicker('+folder.id+')" title="Icon">'+((icon||'📁'))+'<div class="emoji-picker" id="emojiPick_'+folder.id+'">'+EMOJIS.map(e=>'<span class="emoji-pick" onclick="event.stopPropagation();setFolderIcon('+folder.id+',\''+e+'\')">'+e+'</span>').join('')+'<span class="emoji-pick" onclick="event.stopPropagation();setFolderIcon('+folder.id+',\'\')">❌</span></div></span><textarea class="folder-name" rows="1" oninput="autoGrow(this)" onchange="renameFolder('+folder.id+',this)" onfocus="cursorToEnd(this)" onclick="event.stopPropagation()">'+esc(folder.name)+'</textarea><span class="folder-count"'+(inboxHasItems?' style="background:var(--blue-bg);color:var(--blue)"':'')+'>'+undoneCount+'</span><button class="folder-copy-btn" onclick="event.stopPropagation();copyFolderTasks('+folder.id+',this)" title="📋">📋<span class="copy-ok">'+t('copied')+'</span></button><button class="folder-btn" onclick="event.stopPropagation();removeFolder('+folder.id+')" title="🗑">🗑</button></div>';
-fhtml+='<textarea class="folder-desc" rows="1" placeholder="'+t('folderDescPh')+'" oninput="autoGrow(this)" onchange="setFolderDesc('+folder.id+',this.value)" onfocus="cursorToEnd(this);autoGrow(this)" onclick="event.stopPropagation()">'+esc(folder.desc||'')+'</textarea>';
+fhtml+='<textarea class="folder-desc'+(collapsed?' collapsed-hidden':'')+'" rows="1" placeholder="'+t('folderDescPh')+'" oninput="autoGrow(this)" onchange="setFolderDesc('+folder.id+',this.value)" onfocus="cursorToEnd(this);autoGrow(this)" onclick="event.stopPropagation()">'+esc(folder.desc||'')+'</textarea>';
 fhtml+='<div class="folder-body'+(collapsed?' collapsed':'')+'" style="'+(collapsed?'':'max-height:9999px')+'">';
 if(fTasks.length)fhtml+=fTasks.map(tt=>taskHTML(tt,false)).join("");
 fhtml+='<div class="drop-zone" ondragover="onZoneDragOver(event)" ondragleave="onZoneDragLeave(event)" ondrop="onZoneDrop(event,'+folder.id+')">'+t('dragHere')+'</div>';
 fhtml+='</div>';
-fhtml+='<div class="add-task-row"><textarea class="add-task-input" id="addInp_'+folder.id+'" placeholder="'+t('newTaskPh')+'" rows="1" oninput="autoGrow(this)" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();addTaskInFolder('+folder.id+')}"></textarea><button class="add-task-btn" onclick="addTaskInFolder('+folder.id+')">+</button></div>';
+fhtml+='<div class="add-task-row'+(collapsed?' collapsed-hidden':'')+'"><textarea class="add-task-input" id="addInp_'+folder.id+'" placeholder="'+t('newTaskPh')+'" rows="1" oninput="autoGrow(this)" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();addTaskInFolder('+folder.id+')}"></textarea><button class="add-task-btn" onclick="addTaskInFolder('+folder.id+')">+</button></div>';
 if(doneTasks.length){fhtml+='<div class="done-section'+(collapsed?' collapsed':'')+'"><div class="done-toggle'+(folder.doneOpen?' open':'')+'" onclick="toggleDone('+folder.id+')"><svg width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg>'+t('done')+' ('+doneTasks.length+')</div><div class="done-tasks'+(folder.doneOpen?' open':'')+'">'+doneTasks.map(tt=>taskHTML(tt,false)).join("")+'</div></div>'}
 fhtml+='</div>';
 }
@@ -747,6 +745,8 @@ fc.innerHTML=fhtml;
 const dn=S.tasks.filter(tt=>tt.done).length;const tc=S.tasks.filter(tt=>tt.today&&!tt.done).length;
 document.getElementById("stats").textContent=dn+" "+t('of')+" "+S.tasks.length+" "+t('doneLabel')+" · "+tc+" "+t('forToday');
 upTL();
+// Populate quick-add folder dropdown
+const qaSelect=document.getElementById('quickAddFolder');if(qaSelect){const curVal=qaSelect.value;let opts='';S.folders.forEach(f=>{const icon=f.icon||'📁';opts+='<option value="'+f.id+'">'+icon+' '+esc(f.name)+'</option>'});qaSelect.innerHTML=opts;if(curVal&&S.folders.find(f=>f.id===parseInt(curVal)))qaSelect.value=curVal;else{const inb=S.folders.find(f=>f.icon==='📥'||f.name==='Inbox');if(inb)qaSelect.value=inb.id}}
 if(doneOverviewOpen)renderDoneOverview();
 if(logPanelOpen)renderLog();
 document.querySelectorAll('.task-note,.task-title,.folder-desc,.add-task-input,.folder-name,.subtask-title').forEach(autoGrow);
@@ -756,6 +756,11 @@ document.querySelectorAll('#nowZone .task, #todayZone .task, #waitZone .task').f
 function autoGrow(el){if(!el)return;el.style.height='auto';el.style.height=Math.max(16,el.scrollHeight)+'px'}
 
 /* ===== CLICK OUTSIDE TO COLLAPSE TASK ===== */
+// Prevent drag when interacting with text fields
+document.addEventListener('mousedown',function(e){
+const tgt=e.target;if(tgt.tagName==='TEXTAREA'||tgt.tagName==='INPUT'){const task=tgt.closest('.task');if(task)task.setAttribute('draggable','false')}});
+document.addEventListener('mouseup',function(){document.querySelectorAll('.task[draggable="false"]').forEach(el=>el.setAttribute('draggable','true'))});
+document.addEventListener('dragend',function(){document.querySelectorAll('.task[draggable="false"]').forEach(el=>el.setAttribute('draggable','true'))});
 document.addEventListener('click',function(e){
 const clickedTask=e.target.closest('.task');
 // Collapse all other expanded tasks
