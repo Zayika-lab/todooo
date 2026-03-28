@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
@@ -13,6 +14,7 @@
   --warn:#EF9F27;--danger:#E24B4A;
   --blue:#3B82F6;--blue-bg:rgba(59,130,246,0.07);--blue-bd:rgba(59,130,246,0.22);
   --wait:#9370DB;--wait-bg:rgba(147,112,219,0.07);--wait-bd:rgba(147,112,219,0.22);
+  --now-task-bg:rgba(29,158,117,0.06);--today-task-bg:rgba(59,130,246,0.06);
   --rad:6px;--rad-lg:10px;
   --font:'Segoe UI','Helvetica Neue',system-ui,sans-serif;
   --shadow:0 1px 2px rgba(0,0,0,0.04);
@@ -26,6 +28,7 @@
   --accent:#5DCAA5;--accent-bg:rgba(93,202,165,0.08);--accent-bd:rgba(93,202,165,0.25);
   --blue:#60A5FA;--blue-bg:rgba(96,165,250,0.08);--blue-bd:rgba(96,165,250,0.25);
   --wait:#B39DDB;--wait-bg:rgba(179,157,219,0.08);--wait-bd:rgba(179,157,219,0.25);
+  --now-task-bg:rgba(93,202,165,0.08);--today-task-bg:rgba(96,165,250,0.08);
   --shadow:0 1px 3px rgba(0,0,0,0.2);--shadow-lg:0 4px 16px rgba(0,0,0,0.3);
 }
 [data-theme="hacker"]{
@@ -36,6 +39,7 @@
   --warn:#ffcc00;--danger:#ff3333;
   --blue:#00ccff;--blue-bg:rgba(0,204,255,0.06);--blue-bd:rgba(0,204,255,0.2);
   --wait:#cc66ff;--wait-bg:rgba(204,102,255,0.06);--wait-bd:rgba(204,102,255,0.2);
+  --now-task-bg:rgba(0,255,65,0.06);--today-task-bg:rgba(0,204,255,0.06);
   --font:'Courier New',monospace;
   --shadow:0 0 6px rgba(0,255,65,0.08);--shadow-lg:0 0 16px rgba(0,255,65,0.12);
   --btn-rad:2px;
@@ -48,6 +52,7 @@
   --warn:#ff9900;--danger:#ff2060;
   --blue:#4488ff;--blue-bg:rgba(68,136,255,0.06);--blue-bd:rgba(68,136,255,0.25);
   --wait:#aa66ff;--wait-bg:rgba(170,102,255,0.06);--wait-bd:rgba(170,102,255,0.25);
+  --now-task-bg:rgba(0,212,255,0.06);--today-task-bg:rgba(68,136,255,0.06);
   --font:'Consolas','Courier New',monospace;
   --shadow:0 0 8px rgba(0,212,255,0.08);--shadow-lg:0 0 20px rgba(0,212,255,0.15);
   --rad:3px;--rad-lg:5px;--btn-rad:0px;
@@ -60,6 +65,7 @@
   --warn:#f0a030;--danger:#e05050;
   --blue:#60a5fa;--blue-bg:rgba(96,165,250,0.08);--blue-bd:rgba(96,165,250,0.25);
   --wait:#b39ddb;--wait-bg:rgba(179,157,219,0.08);--wait-bd:rgba(179,157,219,0.25);
+  --now-task-bg:rgba(54,181,224,0.08);--today-task-bg:rgba(96,165,250,0.08);
   --shadow:0 2px 6px rgba(0,0,0,0.2);--shadow-lg:0 4px 16px rgba(0,0,0,0.3);
 }
 
@@ -110,6 +116,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 
 /* Sections (Jetzt, Heute, Warten) */
 .section{background:var(--bg1);border:1px solid var(--bd3);border-radius:var(--rad-lg);margin-bottom:8px;box-shadow:var(--shadow);overflow:visible}
+.section.now-section{background:var(--now-task-bg);border-color:var(--accent-bd)}
+.section.today-section{background:var(--today-task-bg);border-color:var(--blue-bd)}
 .section-head{display:flex;align-items:center;gap:5px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;user-select:none;border-bottom:1px solid var(--bd3)}
 .section-head svg{flex-shrink:0}
 .section-count{font-size:10px;padding:0 6px;border-radius:8px;font-weight:600}
@@ -140,15 +148,21 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .collapsed-hidden{display:none!important}
 .folder.inbox-active{border-color:var(--blue-bd)}
 
+/* Hide copy/delete when folder collapsed */
+.folder-head-actions{display:flex;gap:1px;align-items:center;flex-shrink:0}
+.folder.folder-collapsed .folder-head-actions{display:none}
+
 /* Task */
 .task{display:flex;gap:6px;align-items:flex-start;padding:5px 10px;border-bottom:1px solid var(--bd3);transition:all .1s;position:relative}
 .task:last-child{border-bottom:none}
 .task.dragging{opacity:.2;transform:scale(.98)}
 .task textarea,.task input[type=text],.task input[type=number],.task input[type=date]{-webkit-user-select:text;user-select:text}
 .task.done-task{opacity:.4}
-.task.ref-task{border-left:2px solid var(--accent);padding-left:8px}
-.task.ref-task-today{border-left:2px solid var(--blue);padding-left:8px}
+.task.ref-task{border-left:2px solid var(--accent);padding-left:8px;background:var(--now-task-bg)}
+.task.ref-task-today{border-left:2px solid var(--blue);padding-left:8px;background:var(--today-task-bg)}
 .task.waiting-task{border-left:2px solid var(--wait);padding-left:8px;opacity:.7;background:var(--wait-bg)}
+.task.now-highlight{background:var(--now-task-bg)}
+.task.today-highlight{background:var(--today-task-bg)}
 .task-cb{margin-top:2px;width:18px;height:18px;cursor:pointer;accent-color:var(--accent);flex-shrink:0}
 .task-main{flex:1;min-width:0}
 .task-top-btns{display:flex;flex-direction:row;gap:3px;margin-bottom:2px;align-items:center;flex-wrap:wrap}
@@ -217,9 +231,9 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .del-btn{color:var(--tx3);font-size:18px;padding:0 4px;cursor:pointer;background:none;border:none}
 .del-btn:hover{color:var(--danger)}
 
-/* Timer bar */
-.timer-bar{height:3px;background:var(--bg3);border-radius:2px;margin:3px 0 1px;overflow:hidden}
-.timer-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 1s linear}
+/* Timer bar - THICKER */
+.timer-bar{height:6px;background:var(--bg3);border-radius:3px;margin:3px 0 1px;overflow:hidden}
+.timer-fill{height:100%;background:var(--accent);border-radius:3px;transition:width 1s linear}
 .timer-label{font-size:10px;color:var(--accent);font-weight:600;cursor:pointer}
 .timer-label.running{animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
@@ -253,7 +267,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 
 /* Tags panel */
 .tags-panel{background:var(--bg1);border:1px solid var(--bd3);border-radius:var(--rad-lg);margin-bottom:8px;box-shadow:var(--shadow);overflow:hidden}
-.tags-header{display:flex;align-items:center;gap:5px;padding:5px 10px;font-size:11px;font-weight:600;color:var(--tx1);cursor:pointer;user-select:none}
+.tags-header{display:flex;align-items:center;gap:5px;padding:6px 10px;font-size:13px;font-weight:600;color:var(--tx1);cursor:pointer;user-select:none}
 .tags-body{padding:4px 8px;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
 .tag-chip{display:inline-flex;align-items:center;gap:3px;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:600;background:var(--bg3);color:var(--tx1);cursor:pointer;user-select:none;border:1px solid transparent;transition:all .1s}
 .tag-chip:hover{background:var(--bg2);border-color:var(--bd2)}
@@ -291,10 +305,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .popup-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:99998}
 .done-date{font-size:9px;color:var(--tx2);margin-top:1px}
 
-/* Undo button */
-.undo-fab{position:fixed;bottom:20px;left:12px;width:40px;height:40px;border-radius:50%;background:var(--bg1);border:1px solid var(--bd1);box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;z-index:999;transition:all .15s}
-.undo-fab:hover{background:var(--accent-bg);border-color:var(--accent)}
-.undo-fab.hidden{display:none}
+/* Floating action buttons */
+.fab-group{position:fixed;bottom:20px;left:12px;display:flex;flex-direction:column;gap:8px;z-index:999}
+.fab-btn{width:40px;height:40px;border-radius:50%;background:var(--bg1);border:1px solid var(--bd1);box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;transition:all .15s;color:var(--tx0)}
+.fab-btn:hover{background:var(--accent-bg);border-color:var(--accent)}
+.fab-btn.fab-add{background:var(--accent);color:#fff;border-color:var(--accent);font-size:24px;line-height:1;display:flex;align-items:center;justify-content:center}
+.fab-btn.fab-add:hover{opacity:.85}
 
 /* Emoji picker */
 .emoji-picker{position:absolute;top:100%;left:0;background:var(--bg1);border:1px solid var(--bd1);border-radius:var(--rad);box-shadow:var(--shadow-lg);z-index:99999;padding:6px;display:none;flex-wrap:wrap;gap:2px;width:200px}
@@ -304,6 +320,11 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 
 /* Wait date input */
 .wait-date-input{width:110px;font-size:10px;padding:1px 4px;border:1px solid var(--wait-bd);border-radius:var(--rad);background:var(--bg1);color:var(--tx0)}
+
+/* Focus FAB - circle only, bottom left */
+.focus-fab{position:fixed;bottom:76px;left:12px;z-index:1000;width:40px;height:40px;border-radius:50%;background:var(--bg1);border:1px solid var(--bd1);box-shadow:var(--shadow-lg);font-size:18px;cursor:pointer;color:var(--tx1);transition:all .15s;display:flex;align-items:center;justify-content:center;padding:0}
+.focus-fab:hover{border-color:var(--accent);color:var(--accent)}
+.focus-fab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 
 /* Deep focus overlay */
 .deep-focus .section:not(.now-section),.deep-focus .tags-panel,.deep-focus .tl-card,.deep-focus #foldersContainer,.deep-focus .add-folder-btn,.deep-focus .stats,.deep-focus .done-overview-panel,.deep-focus .log-panel,.deep-focus .quick-add,.deep-focus #todayZone,.deep-focus #waitZone{display:none!important}
@@ -326,12 +347,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .deep-focus .now-section{border:2px solid var(--accent-bd);box-shadow:var(--shadow-lg)}
 .focus-exit-bar{display:none}
 
-/* Floating action buttons */
-.fab-group{position:fixed;bottom:20px;left:12px;display:flex;flex-direction:column;gap:8px;z-index:999}
-.fab-btn{width:40px;height:40px;border-radius:50%;background:var(--bg1);border:1px solid var(--bd1);box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;transition:all .15s;color:var(--tx0)}
-.fab-btn:hover{background:var(--accent-bg);border-color:var(--accent)}
-.fab-btn.fab-add{background:var(--accent);color:#fff;border-color:var(--accent);font-size:22px}
-.fab-btn.fab-add:hover{opacity:.85}
+.subtask-date{width:120px;font-size:11px;flex-shrink:0;align-self:center}
+.subtask-date-display{font-size:10px;color:var(--tx2);flex-shrink:0;white-space:nowrap}
+
+/* Subtask today button */
+.subtask-today-btn{font-size:9px;padding:1px 6px;border-radius:var(--btn-rad);background:var(--blue-bg);border:1px solid var(--blue-bd);color:var(--blue);cursor:pointer;white-space:nowrap;font-weight:600}
+.subtask-today-btn:hover{background:var(--blue);color:#fff}
 
 /* Task checkbox column (for ref tasks in now/today) */
 .task-cb-col{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0}
@@ -345,24 +366,15 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .deep-focus-timer .timer-start-btn{padding:4px 12px;border-radius:var(--btn-rad);background:var(--accent);color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer}
 .deep-focus-timer .timer-stop-btn{padding:4px 12px;border-radius:var(--btn-rad);background:var(--danger);color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer}
 
-/* Sticky focus button */
-.focus-fab{position:fixed;top:12px;right:12px;z-index:1000;padding:6px 14px;border-radius:20px;background:var(--bg1);border:1px solid var(--bd1);box-shadow:var(--shadow-lg);font-size:12px;font-weight:600;cursor:pointer;color:var(--tx1);transition:all .15s}
-.focus-fab:hover{border-color:var(--accent);color:var(--accent)}
-.focus-fab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-
-.subtask-date{width:120px;font-size:11px;flex-shrink:0;align-self:center}
-.subtask-date-display{font-size:10px;color:var(--tx2);flex-shrink:0;white-space:nowrap}
-
-/* Subtask today button */
-.subtask-today-btn{font-size:9px;padding:1px 6px;border-radius:var(--btn-rad);background:var(--blue-bg);border:1px solid var(--blue-bd);color:var(--blue);cursor:pointer;white-space:nowrap;font-weight:600}
-.subtask-today-btn:hover{background:var(--blue);color:#fff}
+/* Sticky focus button - handled by .focus-fab above */
 
 /* Mobile Von:/Bis: layout */
 @media(max-width:500px){
-  .tl-card .tl-inputs-wrap{flex-direction:column!important;gap:4px!important}
-  .tl-input-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tl-card .tl-inputs-wrap{flex-direction:column!important;gap:4px!important}
+.tl-input-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 }
 </style>
+
 </head>
 <body>
 <div class="wrap" id="appWrap">
@@ -382,7 +394,6 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
   <div class="top-controls">
     <button class="ctrl-btn" id="doneOverviewBtn" onclick="toggleDoneOverview()" data-i18n="doneOverview">✓ Виконані</button>
     <button class="ctrl-btn" id="logBtn" onclick="toggleLogPanel()">📋 Log</button>
-    <button class="ctrl-btn" id="focusBtn" onclick="toggleDeepFocus()" data-i18n="deepFocus">🎯 Фокус</button>
     <div style="flex:1"></div>
     <div class="theme-dropdown-wrap">
       <button class="theme-dropdown-btn" id="themeDropBtn" onclick="toggleThemeDropdown()"><span id="themeIcon">☀️</span> <span style="font-size:9px">▼</span></button>
@@ -431,6 +442,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
   </div>
 
   <!-- Quick add -->
+
   <div class="quick-add">
     <input type="text" id="quickAddInput" data-i18n-ph="quickAddPh" placeholder="Швидке завдання…" onkeydown="if(event.key==='Enter'){quickAdd()}"/>
     <select id="quickAddFolder" style="font-size:12px;padding:5px 4px;border-radius:var(--rad-lg);border:1px solid var(--bd1);background:var(--bg1);color:var(--tx0);max-width:120px"></select>
@@ -440,10 +452,10 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
   <div id="nowZone"></div>
   <div id="todayZone"></div>
   <div id="waitZone"></div>
-  
+
   <div class="tags-panel" id="tagsPanel">
     <div class="tags-header" onclick="toggleTagsPanel()">
-      <svg class="folder-chevron open" id="tagsChevron" width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg>
+      <svg class="section-chevron" id="tagsChevron" width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg>
       🏷️ <span data-i18n="tagsTitle">Теги</span>
       <span class="folder-count" id="tagsCount">0</span>
     </div>
@@ -457,13 +469,16 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 <div class="fab-group" id="fabGroup">
   <button class="fab-btn" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="↑" style="display:none">↑</button>
   <button class="fab-btn" id="undoBtn2" onclick="undo()" title="Undo" style="display:none">↩</button>
-  <button class="fab-btn fab-add" onclick="fabQuickAdd()" title="+">+</button>
+  <button class="fab-btn fab-add" onclick="fabQuickAdd()" title="+">＋</button>
 </div>
-<button class="focus-fab" id="focusFab" onclick="toggleDeepFocus()" data-i18n="deepFocus">🎯 Фокус</button>
+<button class="focus-fab" id="focusFab" onclick="toggleDeepFocus()">🎯</button>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
 <script>
 /* ===== THEME ===== */
 let curTheme=localStorage.getItem('todooo_theme')||'light';
@@ -553,26 +568,20 @@ function moveTaskToFolder(tid,fid){pushUndo();const tt=S.tasks.find(x=>x.id===ti
 function copyTask(id){const tt=S.tasks.find(x=>x.id===id);if(!tt)return;navigator.clipboard.writeText(tt.title+(tt.note?'\n'+tt.note:'')).then(()=>{}).catch(()=>{})}
 
 /* ===== SUBTASKS ===== */
-function addSubtask(taskId){const tt=S.tasks.find(x=>x.id===taskId);if(!tt)return;if(!tt.subtasks)tt.subtasks=[];pushUndo();const sid=Date.now();tt.subtasks.push({id:sid,title:'',date:null,done:false,doneAt:null});// Update subtasks inline without full re-render
-const taskEl=document.querySelector('.task[data-id="'+taskId+'"]');if(taskEl){const stWrap=taskEl.querySelector('.subtasks-wrap');if(stWrap){stWrap.outerHTML=subtasksHTML(tt,true)}else{const addBtn=taskEl.querySelector('.add-subtask-btn');if(addBtn){const tmp=document.createElement('div');tmp.innerHTML=subtasksHTML(tt,true);addBtn.replaceWith(tmp.firstChild)}}// Auto-click date input for the new subtask
-setTimeout(()=>{const dateInput=taskEl.querySelector('.subtask-date[data-sid="'+sid+'"]');if(dateInput){try{dateInput.showPicker()}catch(e){dateInput.focus()}}taskEl.querySelectorAll('.subtask-title').forEach(autoGrow)},100)}save()}
-function setSubtaskDateToday(taskId,sid,btn){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;const st=tt.subtasks.find(s=>s.id===sid);if(!st)return;const now=new Date();const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');st.date=today;// Update the date input visually
-const dateInput=btn.previousElementSibling;if(dateInput)dateInput.value=today;save();// Focus the title input
-setTimeout(()=>{const titleInput=document.querySelector('.subtask-title[data-sid="'+sid+'"]');if(titleInput)titleInput.focus()},50)}
+function addSubtask(taskId){const tt=S.tasks.find(x=>x.id===taskId);if(!tt)return;if(!tt.subtasks)tt.subtasks=[];pushUndo();const sid=Date.now();tt.subtasks.push({id:sid,title:'',date:null,done:false,doneAt:null});const taskEl=document.querySelector('.task[data-id="'+taskId+'"]');if(taskEl){const stWrap=taskEl.querySelector('.subtasks-wrap');if(stWrap){stWrap.outerHTML=subtasksHTML(tt,true)}else{const addBtn=taskEl.querySelector('.add-subtask-btn');if(addBtn){const tmp=document.createElement('div');tmp.innerHTML=subtasksHTML(tt,true);addBtn.replaceWith(tmp.firstChild)}}setTimeout(()=>{const dateInput=taskEl.querySelector('.subtask-date[data-sid="'+sid+'"]');if(dateInput){try{dateInput.showPicker()}catch(e){dateInput.focus()}}taskEl.querySelectorAll('.subtask-title').forEach(autoGrow)},100)}save()}
+function setSubtaskDateToday(taskId,sid,btn){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;const st=tt.subtasks.find(s=>s.id===sid);if(!st)return;const now=new Date();const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');st.date=today;const dateInput=btn.previousElementSibling;if(dateInput)dateInput.value=today;save();setTimeout(()=>{const titleInput=document.querySelector('.subtask-title[data-sid="'+sid+'"]');if(titleInput)titleInput.focus()},50)}
 function setSubtaskTitle(taskId,sid,val){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;const st=tt.subtasks.find(s=>s.id===sid);if(st)st.title=val;save()}
-function setSubtaskDate(taskId,sid,val){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;const st=tt.subtasks.find(s=>s.id===sid);if(st)st.date=val||null;save();// Focus the title input after date selection
-setTimeout(()=>{const titleInput=document.querySelector('.subtask-title[data-sid="'+sid+'"]');if(titleInput)titleInput.focus()},50)}
+function setSubtaskDate(taskId,sid,val){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;const st=tt.subtasks.find(s=>s.id===sid);if(st)st.date=val||null;save();setTimeout(()=>{const titleInput=document.querySelector('.subtask-title[data-sid="'+sid+'"]');if(titleInput)titleInput.focus()},50)}
 function toggleSubtask(taskId,sid){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;pushUndo();const st=tt.subtasks.find(s=>s.id===sid);if(!st)return;st.done=!st.done;st.doneAt=st.done?Date.now():null;logAction(st.done?'subtaskDone':'subtaskUndone',tt.title+' → '+st.title);render();save()}
 function removeSubtask(taskId,sid){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;pushUndo();tt.subtasks=tt.subtasks.filter(s=>s.id!==sid);render();save()}
 function subtasksHTML(tt,editable){if(!tt.subtasks||!tt.subtasks.length)return editable?'<button class="add-subtask-btn" onclick="event.stopPropagation();addSubtask('+tt.id+')">+ підпункт</button>':'';if(!editable)return '';let h='<div class="subtasks-wrap">';h+='<button class="add-subtask-btn" onclick="event.stopPropagation();addSubtask('+tt.id+')">+ підпункт</button>';const undone=tt.subtasks.filter(s=>!s.done).slice().reverse();const done=tt.subtasks.filter(s=>s.done);undone.forEach(st=>{const dateVal=st.date||'';h+='<div class="subtask"><div class="subtask-date-row"><input type="checkbox" class="subtask-cb" onchange="toggleSubtask('+tt.id+','+st.id+')"/><input type="date" class="subtask-date" value="'+dateVal+'" onchange="setSubtaskDate('+tt.id+','+st.id+',this.value)" onclick="event.stopPropagation()" data-sid="'+st.id+'"/><button class="subtask-rm" onclick="event.stopPropagation();removeSubtask('+tt.id+','+st.id+')">×</button></div><div class="subtask-title-row-sub"><textarea class="subtask-title" data-sid="'+st.id+'" rows="1" placeholder="…" oninput="autoGrow(this)" onchange="setSubtaskTitle('+tt.id+','+st.id+',this.value)" onclick="event.stopPropagation()">'+esc(st.title)+'</textarea></div></div>'});done.forEach(st=>{h+='<div class="subtask" style="opacity:.5"><div class="subtask-date-row"><input type="checkbox" class="subtask-cb" checked onchange="toggleSubtask('+tt.id+','+st.id+')"/>'+(st.date?'<span class="subtask-date-display">'+st.date+'</span>':'')+'<button class="subtask-rm" onclick="event.stopPropagation();removeSubtask('+tt.id+','+st.id+')">×</button></div><div class="subtask-title-row-sub"><span class="subtask-title strike">'+esc(st.title)+'</span></div></div>'});h+='</div>';return h}
+
 function scrollToFolderTask(id){const container=document.getElementById('foldersContainer');if(!container)return;const el=container.querySelector('.task[data-id="'+id+'"]');if(!el)return;const folder=el.closest('.folder');if(folder){const f=S.folders.find(x=>x.id===parseInt(folder.dataset.folderId));if(f&&f.collapsed){f.collapsed=false;render();setTimeout(()=>scrollToFolderTask(id),100);return}}el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='2px solid var(--accent)';setTimeout(()=>el.style.outline='',1500)}
 
 /* ===== TIMER ===== */
 function toggleTimer(id){pushUndo();const tt=S.tasks.find(x=>x.id===id);if(!tt)return;if(tt.timerRunning){tt.timerRunning=false;logAction('timerStop',tt.title)}else{tt.timerRunning=true;tt.timerStart=Date.now();tt.now=true;tt.waiting=false;tt.done=false;logAction('timerStart',tt.title)}render();save()}
 function getTimerRemaining(tt){if(!tt.timerRunning||!tt.timerStart||!tt.mins)return null;const elapsed=(Date.now()-tt.timerStart)/60000;const remaining=tt.mins-elapsed;return remaining}
-setInterval(()=>{let needRender=false;S.tasks.forEach(tt=>{if(tt.timerRunning&&tt.mins){const rem=getTimerRemaining(tt);if(rem!==null&&rem<=0){tt.timerRunning=false;needRender=true}}});if(needRender)render();// Update timer displays
-document.querySelectorAll('.timer-live').forEach(el=>{const id=parseInt(el.dataset.taskId);const tt=S.tasks.find(x=>x.id===id);if(tt&&tt.timerRunning){const rem=getTimerRemaining(tt);if(rem!==null){const m=Math.max(0,Math.floor(rem));const s=Math.max(0,Math.floor((rem-m)*60));el.textContent=m+':'+String(s).padStart(2,'0');// Update all timer bars and remaining displays for this task
-document.querySelectorAll('[id^="timerBar_'+id+'"]').forEach(bar=>{const pct=Math.max(0,Math.min(100,(1-rem/tt.mins)*100));bar.style.width=pct+'%'});document.querySelectorAll('.timer-remaining[data-task-id="'+id+'"]').forEach(sp=>{sp.textContent=m+':'+String(s).padStart(2,'0')})}}})},1000);
+setInterval(()=>{let needRender=false;S.tasks.forEach(tt=>{if(tt.timerRunning&&tt.mins){const rem=getTimerRemaining(tt);if(rem!==null&&rem<=0){tt.timerRunning=false;needRender=true}}});if(needRender)render();document.querySelectorAll('.timer-live').forEach(el=>{const id=parseInt(el.dataset.taskId);const tt=S.tasks.find(x=>x.id===id);if(tt&&tt.timerRunning){const rem=getTimerRemaining(tt);if(rem!==null){const m=Math.max(0,Math.floor(rem));const s=Math.max(0,Math.floor((rem-m)*60));el.textContent=m+':'+String(s).padStart(2,'0');document.querySelectorAll('[id^="timerBar_'+id+'"]').forEach(bar=>{const pct=Math.max(0,Math.min(100,(1-rem/tt.mins)*100));bar.style.width=pct+'%'});document.querySelectorAll('.timer-remaining[data-task-id="'+id+'"]').forEach(sp=>{sp.textContent=m+':'+String(s).padStart(2,'0')})}}})},1000);
 
 /* ===== POPUPS ===== */
 let openPopupId=null;
@@ -609,25 +618,22 @@ function addTaskInFolder(fid){const inp=document.getElementById('addInp_'+fid);c
 function cursorToEnd(el){if(!el)return;const len=el.value?el.value.length:0;el.setSelectionRange(len,len)}
 
 /* ===== DEEP FOCUS ===== */
-function toggleDeepFocus(){deepFocusOn=!deepFocusOn;document.getElementById('appWrap').classList.toggle('deep-focus',deepFocusOn);document.getElementById('focusBtn').classList.toggle('active',deepFocusOn);const fab=document.getElementById('focusFab');if(fab)fab.classList.toggle('active',deepFocusOn)}
+function toggleDeepFocus(){deepFocusOn=!deepFocusOn;document.getElementById('appWrap').classList.toggle('deep-focus',deepFocusOn);const fab=document.getElementById('focusFab');if(fab)fab.classList.toggle('active',deepFocusOn)}
 
 /* ===== EMOJI PICKER ===== */
-const EMOJIS=['📥','📁','💼','🏠','🎯','💡','🔧','📚','🎨','🏃','💪','🧘','🎵','✈️','🛒','💰','❤️','⭐','🔥','🌱','🎓','🤖','📱','🌍','🧠','🍎','🎮','📝','🏢','🔬'];
+const EMOJIS=['📥','📁','💼','🏠','🎯','💡','🔧','📚','🎨','🏃','💪','🧘','🎵','✈️','🛒','💰','❤️','⭐','🔥','🌱','🎓','🤖','📱','🌍','🧠','🍎','🎮','📝','🏢','🔬','✅','📓','🔄','🏗️'];
 function toggleEmojiPicker(fid){const el=document.getElementById('emojiPick_'+fid);if(!el)return;if(el.classList.contains('open'))closeAllPopups();else openPopup(el)}
 
 /* ===== DONE OVERVIEW ===== */
 function toggleDoneOverview(){doneOverviewOpen=!doneOverviewOpen;document.getElementById('doneOverviewBtn').classList.toggle('active',doneOverviewOpen);renderDoneOverview()}
 function renderDoneOverview(){const panel=document.getElementById('doneOverviewPanel');if(!doneOverviewOpen){panel.classList.remove('open');return}panel.classList.add('open');
-// Collect done tasks and done subtasks
 const doneItems=[];
 S.tasks.filter(tt=>tt.done).forEach(tt=>{doneItems.push({type:'task',task:tt,title:tt.title,pc:tt.pc,doneAt:tt.doneAt,folderId:tt.folderId})});
 S.tasks.forEach(tt=>{if(tt.subtasks)tt.subtasks.filter(st=>st.done).forEach(st=>{doneItems.push({type:'subtask',task:tt,title:tt.title,subTitle:st.title,pc:tt.pc,doneAt:st.doneAt,folderId:tt.folderId})})});
 doneItems.sort((a,b)=>(b.doneAt||0)-(a.doneAt||0));
 if(!doneItems.length){panel.innerHTML='<div style="padding:10px;font-size:12px;color:var(--tx2);text-align:center">—</div>';return}
-// Group by day, then by folder within each day
 const dayGroups={};doneItems.forEach(item=>{const d=item.doneAt?new Date(item.doneAt):null;const key=d?d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'):'unknown';if(!dayGroups[key])dayGroups[key]=[];dayGroups[key].push(item)});
 let h='';for(const key of Object.keys(dayGroups)){const label=key==='unknown'?'—':doneAgoText(dayGroups[key][0].doneAt);h+='<div class="done-overview-day">'+label+'</div>';
-// Group items within this day by folder
 const folderGroups={};dayGroups[key].forEach(item=>{const fid=item.folderId||0;if(!folderGroups[fid])folderGroups[fid]=[];folderGroups[fid].push(item)});
 for(const fid of Object.keys(folderGroups)){const folder=S.folders.find(f=>f.id===parseInt(fid));const fname=folder?((folder.icon||'📁')+' '+folder.name):'?';h+='<div style="padding:3px 10px;font-size:10px;font-weight:600;color:var(--tx2);background:var(--bg2)">'+esc(fname)+'</div>';
 folderGroups[fid].forEach(item=>{const c=gc(item.pc);if(item.type==='task'){h+='<div class="done-overview-task"><span class="prio-badge" style="background:'+c.bg+';color:'+c.tx+';border-color:'+c.bd+';font-size:8px;padding:0 4px">'+esc(getPrioMap()[item.pc]||'')+'</span><span style="text-decoration:line-through">'+esc(item.title)+'</span></div>'}else{h+='<div class="done-overview-task" style="flex-direction:column;align-items:flex-start;gap:0"><span style="font-size:11px;color:var(--tx1)">'+esc(item.title)+'</span><span style="font-size:10px;color:var(--tx2);text-decoration:line-through;padding-left:8px">✓ '+esc(item.subTitle)+'</span></div>'}})}}panel.innerHTML=h}
@@ -639,18 +645,14 @@ function toggleWaitSection(){waitCollapsed=!waitCollapsed;render()}
 
 /* ===== DRAG & DROP ===== */
 let dragTaskId=null,dragGhost=null;
-// Touch drag support
 let touchDragId=null,touchGhost=null,touchStartY=0,touchCurrentTarget=null;
 function onTouchDragStart(e,id){if(e.touches.length!==1)return;touchDragId=id;touchStartY=e.touches[0].clientY;const tt=S.tasks.find(x=>x.id===id);touchGhost=document.createElement('div');touchGhost.className='drag-ghost';touchGhost.textContent=tt?tt.title:'';touchGhost.style.left=e.touches[0].clientX+'px';touchGhost.style.top=(e.touches[0].clientY-20)+'px';document.body.appendChild(touchGhost);e.target.closest('.task')?.classList.add('dragging');e.preventDefault()}
-function onTouchDragMove(e){if(!touchDragId||e.touches.length!==1)return;e.preventDefault();const touch=e.touches[0];if(touchGhost){touchGhost.style.left=touch.clientX+'px';touchGhost.style.top=(touch.clientY-20)+'px'}// Find element under touch - hide ghost temporarily
-if(touchGhost)touchGhost.style.pointerEvents='none';const el=document.elementFromPoint(touch.clientX,touch.clientY);if(touchGhost)touchGhost.style.pointerEvents='none';if(el){const taskEl=el.closest('.task');if(taskEl){const tid=parseInt(taskEl.dataset.id);if(tid&&tid!==touchDragId){document.querySelectorAll('.drop-indicator.visible').forEach(x=>x.classList.remove('visible'));const container=taskEl.closest('.section-body,.folder-body');if(container){const ind=container.querySelector('.drop-indicator[data-before="'+tid+'"]');if(ind)ind.classList.add('visible')}else{const ind=document.querySelector('.drop-indicator[data-before="'+tid+'"]');if(ind)ind.classList.add('visible')}touchCurrentTarget=tid}}}}
+function onTouchDragMove(e){if(!touchDragId||e.touches.length!==1)return;e.preventDefault();const touch=e.touches[0];if(touchGhost){touchGhost.style.left=touch.clientX+'px';touchGhost.style.top=(touch.clientY-20)+'px'}if(touchGhost)touchGhost.style.pointerEvents='none';const el=document.elementFromPoint(touch.clientX,touch.clientY);if(touchGhost)touchGhost.style.pointerEvents='none';if(el){const taskEl=el.closest('.task');if(taskEl){const tid=parseInt(taskEl.dataset.id);if(tid&&tid!==touchDragId){document.querySelectorAll('.drop-indicator.visible').forEach(x=>x.classList.remove('visible'));const container=taskEl.closest('.section-body,.folder-body');if(container){const ind=container.querySelector('.drop-indicator[data-before="'+tid+'"]');if(ind)ind.classList.add('visible')}else{const ind=document.querySelector('.drop-indicator[data-before="'+tid+'"]');if(ind)ind.classList.add('visible')}touchCurrentTarget=tid}}}}
 function onTouchDragEnd(e){if(!touchDragId)return;document.querySelectorAll('.task.dragging').forEach(el=>el.classList.remove('dragging'));document.querySelectorAll('.drop-indicator.visible').forEach(el=>el.classList.remove('visible'));if(touchGhost){touchGhost.remove();touchGhost=null}if(touchCurrentTarget&&touchDragId!==touchCurrentTarget){pushUndo();const fi=S.tasks.findIndex(x=>x.id===touchDragId);if(fi>=0){const item=S.tasks.splice(fi,1)[0];const ni=S.tasks.findIndex(x=>x.id===touchCurrentTarget);S.tasks.splice(ni,0,item);render();save()}}touchDragId=null;touchCurrentTarget=null}
 function onDragStart(e,id){dragTaskId=id;const tt=S.tasks.find(x=>x.id===id);dragGhost=document.createElement('div');dragGhost.className='drag-ghost';dragGhost.textContent=tt?tt.title:'';document.body.appendChild(dragGhost);e.dataTransfer.setDragImage(dragGhost,16,12);e.dataTransfer.effectAllowed='move';requestAnimationFrame(()=>{e.target.closest('.task')?.classList.add('dragging')});document.querySelectorAll('.drop-zone').forEach(z=>z.style.display='flex')}
 function onDragEnd(e){document.querySelectorAll('.task.dragging').forEach(el=>el.classList.remove('dragging'));document.querySelectorAll('.drop-indicator.visible').forEach(el=>el.classList.remove('visible'));document.querySelectorAll('.drop-zone.drag-hover').forEach(el=>el.classList.remove('drag-hover'));if(dragGhost){dragGhost.remove();dragGhost=null}dragTaskId=null}
-function onTaskDragOver(e,tid){e.preventDefault();e.dataTransfer.dropEffect='move';if(tid===dragTaskId)return;document.querySelectorAll('.drop-indicator.visible').forEach(el=>el.classList.remove('visible'));// Scope indicator to same container (section or folder)
-const container=e.target.closest('.section-body,.folder-body');if(container){const ind=container.querySelector('.drop-indicator[data-before="'+tid+'"]');if(ind)ind.classList.add('visible')}else{const ind=document.querySelector('.drop-indicator[data-before="'+tid+'"]');if(ind)ind.classList.add('visible')}}
-function onTaskDrop(e,tid){e.preventDefault();document.querySelectorAll('.drop-indicator.visible').forEach(el=>el.classList.remove('visible'));if(!dragTaskId||dragTaskId===tid)return;pushUndo();const target=S.tasks.find(x=>x.id===tid);const fi=S.tasks.findIndex(x=>x.id===dragTaskId);if(fi<0||!target)return;const item=S.tasks.splice(fi,1)[0];// Only change folder if dragging into a folder zone, not within now/today/wait sections
-const dragEl=e.target.closest('.section')||e.target.closest('.folder');const isSection=e.target.closest('.section');if(!isSection){item.folderId=target.folderId}const ni=S.tasks.findIndex(x=>x.id===tid);S.tasks.splice(ni,0,item);render();save()}
+function onTaskDragOver(e,tid){e.preventDefault();e.dataTransfer.dropEffect='move';if(tid===dragTaskId)return;document.querySelectorAll('.drop-indicator.visible').forEach(el=>el.classList.remove('visible'));const container=e.target.closest('.section-body,.folder-body');if(container){const ind=container.querySelector('.drop-indicator[data-before="'+tid+'"]');if(ind)ind.classList.add('visible')}else{const ind=document.querySelector('.drop-indicator[data-before="'+tid+'"]');if(ind)ind.classList.add('visible')}}
+function onTaskDrop(e,tid){e.preventDefault();document.querySelectorAll('.drop-indicator.visible').forEach(el=>el.classList.remove('visible'));if(!dragTaskId||dragTaskId===tid)return;pushUndo();const target=S.tasks.find(x=>x.id===tid);const fi=S.tasks.findIndex(x=>x.id===dragTaskId);if(fi<0||!target)return;const item=S.tasks.splice(fi,1)[0];const isSection=e.target.closest('.section');if(!isSection){item.folderId=target.folderId}const ni=S.tasks.findIndex(x=>x.id===tid);S.tasks.splice(ni,0,item);render();save()}
 function onZoneDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';e.currentTarget.classList.add('drag-hover')}
 function onZoneDragLeave(e){e.currentTarget.classList.remove('drag-hover')}
 function onZoneDrop(e,fid){e.preventDefault();e.currentTarget.classList.remove('drag-hover');if(!dragTaskId)return;pushUndo();const fi=S.tasks.findIndex(x=>x.id===dragTaskId);if(fi<0)return;const item=S.tasks.splice(fi,1)[0];item.folderId=fid;const ft=S.tasks.filter(x=>x.folderId===fid&&!x.done);let ii=S.tasks.length;if(ft.length){const lastIdx=S.tasks.indexOf(ft[ft.length-1]);ii=lastIdx+1}S.tasks.splice(ii,0,item);render();save()}
@@ -671,7 +673,6 @@ let timerH='';if(tt.timerRunning&&tt.mins){const rem=getTimerRemaining(tt);const
 const po=[{pc:'red',l:t('prioUrgentL')},{pc:'amber',l:t('prioImportantL')},{pc:'teal',l:t('prioMediumL')},{pc:'gray',l:t('prioLowL')}].map(p=>'<div class="prio-opt" onclick="event.stopPropagation();setPrio('+tt.id+',\''+p.pc+'\')">'+p.l+'</div>').join('');
 let fo=S.folders.map(f=>'<div class="folder-popup-opt'+(f.id===tt.folderId?' current':'')+'" onclick="event.stopPropagation();moveTaskToFolder('+tt.id+','+f.id+')">'+esc(f.name)+'</div>').join('');
 let tp=S.tags.map(tg=>{const has=tt.tags&&tt.tags.includes(tg.id);return'<div class="tag-add-opt" onclick="event.stopPropagation();toggleTagOnTask('+tt.id+','+tg.id+')">'+(has?'<span class="check">✓</span>':'<span style="width:12px;display:inline-block"></span>')+' '+esc(tg.name)+'</div>'}).join('');
-// Wait date
 let waitH='';if(tt.waiting){const wd=tt.waitUntil?new Date(tt.waitUntil).toISOString().split('T')[0]:'';waitH='<input type="date" class="wait-date-input" value="'+wd+'" onchange="setWaitDate('+tt.id+',this.value)" onclick="event.stopPropagation()"/>';}
 return'<div class="drop-indicator" data-before="'+tt.id+'"></div><div class="task '+refClass+'" data-id="'+tt.id+'" draggable="true" ondragstart="onDragStart(event,'+tt.id+')" ondragend="onDragEnd(event)" ondragover="onTaskDragOver(event,'+tt.id+')" ondrop="onTaskDrop(event,'+tt.id+')"><div class="task-cb-col"><input type="checkbox" class="task-cb" onchange="tog('+tt.id+')"/><button class="task-scroll-btn" onclick="event.stopPropagation();scrollToFolderTask('+tt.id+')" title="'+t('scrollToFolder')+'">↓</button></div><div class="task-main"><div class="task-top-btns"><div class="prio-badge-wrap"><span class="prio-badge" style="background:'+c.bg+';color:'+c.tx+';border-color:'+c.bd+'" onclick="event.stopPropagation();togglePrio('+tt.id+')">'+esc(pl)+'</span><div class="prio-dropdown" id="prioDd_'+tt.id+'_ref">'+po+'</div></div><button class="task-left-btn now-l'+(tt.now?' active':'')+'" onclick="setNow('+tt.id+')">⚡'+t('now')+'</button><button class="task-left-btn today-l'+(tt.today?' active':'')+'" onclick="setToday('+tt.id+')">📅'+t('today')+'</button><button class="task-left-btn wait-l'+(tt.waiting?' active':'')+'" onclick="setWaiting('+tt.id+')">⏳'+t('wait')+'</button>'+waitH+(tt.timerRunning?'<span class="timer-label running timer-live" data-task-id="'+tt.id+'" onclick="event.stopPropagation();toggleTimer('+tt.id+')" style="cursor:pointer">⏱</span>':(tt.mins?'<button class="task-left-btn" style="color:var(--accent);font-size:9px;border:1px solid var(--accent-bd);background:var(--accent-bg)" onclick="event.stopPropagation();toggleTimer('+tt.id+')">▶ '+tt.mins+t('min')+'</button>':''))+'</div><div class="task-title-row"><textarea class="task-title" rows="1" oninput="autoGrow(this)" onchange="setTitle('+tt.id+',this.value)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur()}" onfocus="cursorToEnd(this);showTaskDetails(this.closest(\'.task\'))">'+esc(tt.title)+'</textarea></div>'+((hasNote||hasSubtasks)?'<div class="task-note-hint" onclick="showTaskDetails(this.closest(\'.task\'))">'+noteHintSVG()+'</div>':'')+'<textarea class="task-note hidden-note" rows="1" placeholder="…" oninput="autoGrow(this)" onchange="setNote('+tt.id+',this.value)" onfocus="cursorToEnd(this);autoGrow(this)">'+esc(tt.note)+'</textarea><div class="task-row hidden-row"><input type="number" class="dur-input" value="'+(tt.mins||0)+'" min="0" step="5" onchange="setMins('+tt.id+',this.value)"/><span class="dur-label">'+t('min')+'</span>'+(tt.mins?'<button class="task-action-btn" onclick="toggleTimer('+tt.id+')">'+(tt.timerRunning?t('stopTimer'):t('startTimer'))+'</button>':'')+'<span style="position:relative;display:inline-flex"><span class="folder-label" onclick="event.stopPropagation();toggleFolderPopup('+tt.id+')">📁 '+fn+'</span><div class="folder-popup" id="folderPop_'+tt.id+'_ref">'+fo+'</div></span><span style="position:relative;display:inline-flex"><span class="folder-label" onclick="event.stopPropagation();toggleTagPopup('+tt.id+')">'+t('tagLabel')+'+</span><div class="tag-add-popup" id="tagPop_'+tt.id+'_ref">'+tp+(S.tags.length===0?'<div style="padding:4px 8px;font-size:10px;color:var(--tx3)">—</div>':'')+'<div style="border-top:1px solid var(--bd3);padding:3px 6px"><input type="text" class="add-tag-input" style="width:100%;box-sizing:border-box" placeholder="'+t('addTagPh')+'" onclick="event.stopPropagation()" onkeydown="if(event.key===\'Enter\'){event.stopPropagation();addTagAndAssign(this.value,'+tt.id+');this.value=\'\'}"/></div></div></span>'+th+'</div>'+subtasksHTML(tt,false)+timerH+'<div class="deep-focus-timer" data-task-id="'+tt.id+'">'+(tt.timerRunning?'<span class="timer-remaining timer-live" data-task-id="'+tt.id+'" style="font-size:16px;font-weight:700;color:var(--accent)">⏱</span><button class="timer-stop-btn" onclick="event.stopPropagation();toggleTimer('+tt.id+')">⏸ Stop</button>':'<input type="number" class="dur-input" value="'+(tt.mins||0)+'" min="1" step="5" onchange="setMins('+tt.id+',this.value)" style="font-size:14px;width:55px" placeholder="'+t('min')+'"/><span class="dur-label">'+t('min')+'</span><button class="timer-start-btn" onclick="event.stopPropagation();if(!S.tasks.find(x=>x.id==='+tt.id+').mins){S.tasks.find(x=>x.id==='+tt.id+').mins=parseInt(this.parentElement.querySelector(\'.dur-input\').value)||25}toggleTimer('+tt.id+')">▶ Start</button>')+'</div><div class="ref-folder-info" style="font-size:9px;color:var(--tx2);margin-top:1px">'+(fi?fi+' ':'')+fn+'</div></div><div class="task-actions"><button class="task-action-btn" onclick="copyTask('+tt.id+')" title="Copy">📋</button></div></div>'
 }
@@ -679,22 +680,22 @@ return'<div class="drop-indicator" data-before="'+tt.id+'"></div><div class="tas
 function taskHTML(tt,isRef){
 if(isRef)return refTaskHTML(tt,tt.now?'ref-task':tt.waiting?'waiting-task':'ref-task-today');
 const c=gc(tt.pc);const isDone=tt.done;const folder=S.folders.find(f=>f.id===tt.folderId);const fn=folder?esc(folder.name):'?';const fi=folder&&folder.icon?folder.icon:'';const pl=getPrioMap()[tt.pc]||tt.prio||t('prioLow');
+// Determine highlight class for folder tasks
+let highlightClass='';
+if(!isDone&&!tt.waiting){if(tt.now)highlightClass=' now-highlight';else if(tt.today)highlightClass=' today-highlight'}
 let th='';if(tt.tags&&tt.tags.length)th=tt.tags.map(tid=>{const tg=S.tags.find(x=>x.id===tid);if(!tg)return'';return'<span class="task-tag"><span>'+esc(tg.name)+'</span><span class="ttag-rm" onclick="event.stopPropagation();toggleTagOnTask('+tt.id+','+tid+')">×</span></span>'}).join('');
 let fo=S.folders.map(f=>'<div class="folder-popup-opt'+(f.id===tt.folderId?' current':'')+'" onclick="event.stopPropagation();moveTaskToFolder('+tt.id+','+f.id+')">'+esc(f.name)+'</div>').join('');
 const po=[{pc:'red',l:t('prioUrgentL')},{pc:'amber',l:t('prioImportantL')},{pc:'teal',l:t('prioMediumL')},{pc:'gray',l:t('prioLowL')}].map(p=>'<div class="prio-opt" onclick="event.stopPropagation();setPrio('+tt.id+',\''+p.pc+'\')">'+p.l+'</div>').join('');
 let tp=S.tags.map(tg=>{const has=tt.tags&&tt.tags.includes(tg.id);return'<div class="tag-add-opt" onclick="event.stopPropagation();toggleTagOnTask('+tt.id+','+tg.id+')">'+(has?'<span class="check">✓</span>':'<span style="width:12px;display:inline-block"></span>')+' '+esc(tg.name)+'</div>'}).join('');
 const doneInfo=isDone&&tt.doneAt?'<div class="done-date">✓ '+doneAgoText(tt.doneAt)+'</div>':'';
 const hasNote=!!tt.note;const hasTags=tt.tags&&tt.tags.length>0;const hasSubtasks=tt.subtasks&&tt.subtasks.length>0;
-// Determine if details should show (expand on focus handled by CSS/JS)
 let timerH='';if(tt.timerRunning&&tt.mins){const rem=getTimerRemaining(tt);const pct=rem!==null?Math.max(0,Math.min(100,(1-rem/tt.mins)*100)):0;const remMin=rem!==null?Math.max(0,Math.floor(rem)):0;const remSec=rem!==null?Math.max(0,Math.floor((rem-Math.floor(rem))*60)):0;timerH='<div style="margin:3px 0 1px"><div class="timer-bar"><div class="timer-fill" id="timerBar_'+tt.id+'" style="width:'+pct+'%"></div></div><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--tx2);margin-top:1px"><span class="timer-remaining" data-task-id="'+tt.id+'">'+remMin+':'+String(remSec).padStart(2,'0')+'</span><span>'+tt.mins+' '+t('min')+'</span></div></div>'}
-// Wait date
 let waitH='';if(tt.waiting){const wd=tt.waitUntil?new Date(tt.waitUntil).toISOString().split('T')[0]:'';waitH='<input type="date" class="wait-date-input" value="'+wd+'" onchange="setWaitDate('+tt.id+',this.value)" onclick="event.stopPropagation()"/>';}
 
-return'<div class="drop-indicator" data-before="'+tt.id+'"></div><div class="task'+(isDone?' done-task':'')+(tt.waiting?' waiting-task':'')+'" data-id="'+tt.id+'" draggable="true" ondragstart="onDragStart(event,'+tt.id+')" ondragend="onDragEnd(event)" ondragover="onTaskDragOver(event,'+tt.id+')" ondrop="onTaskDrop(event,'+tt.id+')"><input type="checkbox" class="task-cb" '+(isDone?"checked":"")+' onchange="tog('+tt.id+')"/><div class="task-main">'+(!isDone?'<div class="task-top-btns"><div class="prio-badge-wrap"><span class="prio-badge" style="background:'+c.bg+';color:'+c.tx+';border-color:'+c.bd+'" onclick="event.stopPropagation();togglePrio('+tt.id+')">'+esc(pl)+'</span><div class="prio-dropdown" id="prioDd_'+tt.id+'">'+po+'</div></div><button class="task-left-btn now-l'+(tt.now?' active':'')+'" onclick="setNow('+tt.id+')">⚡'+t('now')+'</button><button class="task-left-btn today-l'+(tt.today?' active':'')+'" onclick="setToday('+tt.id+')">📅'+t('today')+'</button><button class="task-left-btn wait-l'+(tt.waiting?' active':'')+'" onclick="setWaiting('+tt.id+')">⏳'+t('wait')+'</button>'+waitH+(tt.timerRunning?'<span class="timer-label running timer-live" data-task-id="'+tt.id+'" onclick="event.stopPropagation();toggleTimer('+tt.id+')" style="cursor:pointer">⏱</span>':(tt.mins?'<button class="task-left-btn" style="color:var(--accent);font-size:9px;border:1px solid var(--accent-bd);background:var(--accent-bg)" onclick="event.stopPropagation();toggleTimer('+tt.id+')">▶ '+tt.mins+t('min')+'</button>':''))+'</div>':'<div class="prio-badge-wrap" style="margin-bottom:2px"><span class="prio-badge" style="background:'+c.bg+';color:'+c.tx+';border-color:'+c.bd+'">'+esc(pl)+'</span></div>')+'<div class="task-title-row"><textarea class="task-title'+(isDone?' strike':'')+'" rows="1" oninput="autoGrow(this)" onchange="setTitle('+tt.id+',this.value)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur()}" onfocus="cursorToEnd(this);showTaskDetails(this.closest(\'.task\'))">'+esc(tt.title)+'</textarea></div>'+((hasNote||hasSubtasks)?'<div class="task-note-hint" onclick="showTaskDetails(this.closest(\'.task\'))">'+noteHintSVG()+'</div>':'')+'<textarea class="task-note hidden-note" rows="1" placeholder="…" oninput="autoGrow(this)" onchange="setNote('+tt.id+',this.value)" onfocus="cursorToEnd(this);autoGrow(this)">'+esc(tt.note)+'</textarea>'+doneInfo+subtasksHTML(tt,false)+'<div class="task-row hidden-row"><input type="number" class="dur-input" value="'+(tt.mins||0)+'" min="0" step="5" onchange="setMins('+tt.id+',this.value)"/><span class="dur-label">'+t('min')+'</span>'+(tt.mins&&!isDone?'<button class="task-action-btn" onclick="toggleTimer('+tt.id+')">'+(tt.timerRunning?t('stopTimer'):t('startTimer'))+'</button>':'')+'<span style="position:relative;display:inline-flex"><span class="folder-label" onclick="event.stopPropagation();toggleFolderPopup('+tt.id+')">📁 '+fn+'</span><div class="folder-popup" id="folderPop_'+tt.id+'">'+fo+'</div></span><span style="position:relative;display:inline-flex"><span class="folder-label" onclick="event.stopPropagation();toggleTagPopup('+tt.id+')">'+t('tagLabel')+'+</span><div class="tag-add-popup" id="tagPop_'+tt.id+'">'+tp+(S.tags.length===0?'<div style="padding:4px 8px;font-size:10px;color:var(--tx3)">—</div>':'')+'<div style="border-top:1px solid var(--bd3);padding:3px 6px"><input type="text" class="add-tag-input" style="width:100%;box-sizing:border-box" placeholder="'+t('addTagPh')+'" onclick="event.stopPropagation()" onkeydown="if(event.key===\'Enter\'){event.stopPropagation();addTagAndAssign(this.value,'+tt.id+');this.value=\'\'}"/></div></div></span>'+th+'</div>'+timerH+'</div><div class="task-actions"><button class="task-action-btn" onclick="copyTask('+tt.id+')" title="Copy">📋</button><button class="del-btn" onclick="rem('+tt.id+')" title="×">×</button></div></div>'
+return'<div class="drop-indicator" data-before="'+tt.id+'"></div><div class="task'+(isDone?' done-task':'')+(tt.waiting?' waiting-task':'')+highlightClass+'" data-id="'+tt.id+'" draggable="true" ondragstart="onDragStart(event,'+tt.id+')" ondragend="onDragEnd(event)" ondragover="onTaskDragOver(event,'+tt.id+')" ondrop="onTaskDrop(event,'+tt.id+')"><input type="checkbox" class="task-cb" '+(isDone?"checked":"")+' onchange="tog('+tt.id+')"/><div class="task-main">'+(!isDone?'<div class="task-top-btns"><div class="prio-badge-wrap"><span class="prio-badge" style="background:'+c.bg+';color:'+c.tx+';border-color:'+c.bd+'" onclick="event.stopPropagation();togglePrio('+tt.id+')">'+esc(pl)+'</span><div class="prio-dropdown" id="prioDd_'+tt.id+'">'+po+'</div></div><button class="task-left-btn now-l'+(tt.now?' active':'')+'" onclick="setNow('+tt.id+')">⚡'+t('now')+'</button><button class="task-left-btn today-l'+(tt.today?' active':'')+'" onclick="setToday('+tt.id+')">📅'+t('today')+'</button>'+waitH+(tt.timerRunning?'<span class="timer-label running timer-live" data-task-id="'+tt.id+'" onclick="event.stopPropagation();toggleTimer('+tt.id+')" style="cursor:pointer">⏱</span>':(tt.mins?'<button class="task-left-btn" style="color:var(--accent);font-size:9px;border:1px solid var(--accent-bd);background:var(--accent-bg)" onclick="event.stopPropagation();toggleTimer('+tt.id+')">▶ '+tt.mins+t('min')+'</button>':''))+'</div>':'<div class="prio-badge-wrap" style="margin-bottom:2px"><span class="prio-badge" style="background:'+c.bg+';color:'+c.tx+';border-color:'+c.bd+'">'+esc(pl)+'</span></div>')+'<div class="task-title-row"><textarea class="task-title'+(isDone?' strike':'')+'" rows="1" oninput="autoGrow(this)" onchange="setTitle('+tt.id+',this.value)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur()}" onfocus="cursorToEnd(this);showTaskDetails(this.closest(\'.task\'))">'+esc(tt.title)+'</textarea></div>'+((hasNote||hasSubtasks)?'<div class="task-note-hint" onclick="showTaskDetails(this.closest(\'.task\'))">'+noteHintSVG()+'</div>':'')+'<textarea class="task-note hidden-note" rows="1" placeholder="…" oninput="autoGrow(this)" onchange="setNote('+tt.id+',this.value)" onfocus="cursorToEnd(this);autoGrow(this)">'+esc(tt.note)+'</textarea>'+doneInfo+subtasksHTML(tt,false)+'<div class="task-row hidden-row"><input type="number" class="dur-input" value="'+(tt.mins||0)+'" min="0" step="5" onchange="setMins('+tt.id+',this.value)"/><span class="dur-label">'+t('min')+'</span>'+(tt.mins&&!isDone?'<button class="task-action-btn" onclick="toggleTimer('+tt.id+')">'+(tt.timerRunning?t('stopTimer'):t('startTimer'))+'</button>':'')+'<button class="task-left-btn wait-l'+(tt.waiting?' active':'')+'" onclick="setWaiting('+tt.id+')">⏳'+t('wait')+'</button><span style="position:relative;display:inline-flex"><span class="folder-label" onclick="event.stopPropagation();toggleFolderPopup('+tt.id+')">📁 '+fn+'</span><div class="folder-popup" id="folderPop_'+tt.id+'">'+fo+'</div></span><span style="position:relative;display:inline-flex"><span class="folder-label" onclick="event.stopPropagation();toggleTagPopup('+tt.id+')">'+t('tagLabel')+'+</span><div class="tag-add-popup" id="tagPop_'+tt.id+'">'+tp+(S.tags.length===0?'<div style="padding:4px 8px;font-size:10px;color:var(--tx3)">—</div>':'')+'<div style="border-top:1px solid var(--bd3);padding:3px 6px"><input type="text" class="add-tag-input" style="width:100%;box-sizing:border-box" placeholder="'+t('addTagPh')+'" onclick="event.stopPropagation()" onkeydown="if(event.key===\'Enter\'){event.stopPropagation();addTagAndAssign(this.value,'+tt.id+');this.value=\'\'}"/></div></div></span>'+th+'</div>'+timerH+'</div><div class="task-actions"><button class="task-action-btn" onclick="copyTask('+tt.id+')" title="Copy">📋</button><button class="del-btn" onclick="rem('+tt.id+')" title="×">×</button></div></div>'
 }
 
-function showTaskDetails(taskEl){if(!taskEl)return;const notes=taskEl.querySelectorAll('.hidden-note');notes.forEach(n=>n.classList.remove('hidden-note'));const rows=taskEl.querySelectorAll('.hidden-row');rows.forEach(r=>r.classList.remove('hidden-row'));const hints=taskEl.querySelectorAll('.task-note-hint');hints.forEach(h=>h.style.display='none');// Show subtask edit mode
-const tid=parseInt(taskEl.dataset.id);const tt=S.tasks.find(x=>x.id===tid);if(tt){const stWrap=taskEl.querySelector('.subtasks-wrap');const existingAddBtn=taskEl.querySelector('.add-subtask-btn');if(stWrap){stWrap.outerHTML=subtasksHTML(tt,true)}else if(!existingAddBtn){const insertBefore=taskEl.querySelector('.task-row');const stHTML=subtasksHTML(tt,true);if(stHTML&&insertBefore){const tmp=document.createElement('div');tmp.innerHTML=stHTML;const el=tmp.firstChild;if(el)insertBefore.parentNode.insertBefore(el,insertBefore)}}}taskEl.querySelectorAll('.task-note,.task-title,.subtask-title').forEach(autoGrow)}
+function showTaskDetails(taskEl){if(!taskEl)return;const notes=taskEl.querySelectorAll('.hidden-note');notes.forEach(n=>n.classList.remove('hidden-note'));const rows=taskEl.querySelectorAll('.hidden-row');rows.forEach(r=>r.classList.remove('hidden-row'));const hints=taskEl.querySelectorAll('.task-note-hint');hints.forEach(h=>h.style.display='none');const tid=parseInt(taskEl.dataset.id);const tt=S.tasks.find(x=>x.id===tid);if(tt){const stWrap=taskEl.querySelector('.subtasks-wrap');const existingAddBtn=taskEl.querySelector('.add-subtask-btn');if(stWrap){stWrap.outerHTML=subtasksHTML(tt,true)}else if(!existingAddBtn){const insertBefore=taskEl.querySelector('.task-row');const stHTML=subtasksHTML(tt,true);if(stHTML&&insertBefore){const tmp=document.createElement('div');tmp.innerHTML=stHTML;const el=tmp.firstChild;if(el)insertBefore.parentNode.insertBefore(el,insertBefore)}}}taskEl.querySelectorAll('.task-note,.task-title,.subtask-title').forEach(autoGrow)}
 
 /* ===== RENDER ===== */
 function render(){
@@ -706,13 +707,13 @@ if(tagsBody){if(!tagsOpen){tagsBody.style.display='none'}else{tagsBody.style.dis
 
 // NOW section
 const nowEl=document.getElementById("nowZone");const nowTasks=S.tasks.filter(tt=>tt.now&&!tt.done&&!tt.waiting&&taskMatchesTagFilter(tt));
-if(nowTasks.length){let h='<div class="section now-section" style="border-color:var(--accent-bd)"><div class="section-head" style="color:var(--accent)"><svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M8.5 1L3 9.5h4.5L7 15l6-8.5H8.5L9 1z" fill="currentColor"/></svg>'+t('now')+' <span class="section-count" style="background:var(--accent-bg);color:var(--accent)">'+nowTasks.length+'</span></div><div class="section-body">';h+=nowTasks.map(tt=>taskHTML(tt,true)).join("");h+='</div></div>';nowEl.innerHTML=h}else{nowEl.innerHTML=''}
+if(nowTasks.length){let h='<div class="section now-section"><div class="section-head" style="color:var(--accent)"><svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M8.5 1L3 9.5h4.5L7 15l6-8.5H8.5L9 1z" fill="currentColor"/></svg>'+t('now')+' <span class="section-count" style="background:var(--accent-bg);color:var(--accent)">'+nowTasks.length+'</span></div><div class="section-body">';h+=nowTasks.map(tt=>taskHTML(tt,true)).join("");h+='</div></div>';nowEl.innerHTML=h}else{nowEl.innerHTML=''}
 
 // TODAY section
 const todayEl=document.getElementById("todayZone");const todayTasks=S.tasks.filter(tt=>tt.today&&!tt.done&&!tt.waiting&&taskMatchesTagFilter(tt));
-if(todayTasks.length){let h='<div class="section" style="border-color:var(--blue-bd)"><div class="section-head" style="color:var(--blue)" onclick="toggleTodaySection()"><svg class="section-chevron'+(todayCollapsed?'':' open')+'" width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg><svg width="14" height="14" fill="none" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="5" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.2"/><line x1="5" y1="9" x2="9" y2="9" stroke="currentColor" stroke-width="1.2"/></svg>'+t('today')+' <span class="section-count" style="background:var(--blue-bg);color:var(--blue)">'+todayTasks.length+'</span></div><div class="section-body'+(todayCollapsed?' collapsed':'')+'">';h+=todayTasks.map(tt=>taskHTML(tt,true)).join("");h+='</div></div>';todayEl.innerHTML=h}else{todayEl.innerHTML=''}
+if(todayTasks.length){let h='<div class="section today-section"><div class="section-head" style="color:var(--blue)" onclick="toggleTodaySection()"><svg class="section-chevron'+(todayCollapsed?'':' open')+'" width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg><svg width="14" height="14" fill="none" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="5" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.2"/><line x1="5" y1="9" x2="9" y2="9" stroke="currentColor" stroke-width="1.2"/></svg>'+t('today')+' <span class="section-count" style="background:var(--blue-bg);color:var(--blue)">'+todayTasks.length+'</span></div><div class="section-body'+(todayCollapsed?' collapsed':'')+'">';h+=todayTasks.map(tt=>taskHTML(tt,true)).join("");h+='</div></div>';todayEl.innerHTML=h}else{todayEl.innerHTML=''}
 
-// WAITING section
+// WAITING section - hide if empty
 const waitEl=document.getElementById("waitZone");const waitTasks=S.tasks.filter(tt=>tt.waiting&&!tt.done&&taskMatchesTagFilter(tt)).sort((a,b)=>(a.waitUntil||Infinity)-(b.waitUntil||Infinity));
 if(waitTasks.length){let h='<div class="section" style="border-color:var(--wait-bd);background:var(--wait-bg)"><div class="section-head" style="color:var(--wait)" onclick="toggleWaitSection()"><svg class="section-chevron'+(waitCollapsed?'':' open')+'" width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg>⏳ '+t('wait')+' <span class="section-count" style="background:var(--wait-bg);color:var(--wait)">'+waitTasks.length+'</span></div><div class="section-body'+(waitCollapsed?' collapsed':'')+'">';h+=waitTasks.map(tt=>taskHTML(tt,true)).join("");h+='</div></div>';waitEl.innerHTML=h}else{waitEl.innerHTML=''}
 
@@ -730,7 +731,7 @@ const inboxHasItems=isInbox&&undoneCount>0;
 if(isInbox&&undoneCount===0)continue;
 const folderHeadStyle=inboxHasItems?'style="background:var(--blue-bg);border-color:var(--blue-bd)"':'';
 fhtml+='<div class="folder-drop-zone" ondragover="onFolderDropZoneDragOver(event)" ondragleave="onFolderDropZoneDragLeave(event)" ondrop="onFolderDrop(event,'+folder.id+')"></div>';
-fhtml+='<div class="folder'+(inboxHasItems?' inbox-active':'')+'" data-folder-id="'+folder.id+'"><div class="folder-head" '+folderHeadStyle+' draggable="true" ondragstart="onFolderDragStart(event,'+folder.id+')" ondragend="onFolderDragEnd(event)" onclick="toggleFolder('+folder.id+')"><svg class="folder-chevron'+(collapsed?'':' open')+'" width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg><span class="folder-icon-btn" style="position:relative" onclick="event.stopPropagation();toggleEmojiPicker('+folder.id+')" title="Icon">'+((icon||'📁'))+'<div class="emoji-picker" id="emojiPick_'+folder.id+'">'+EMOJIS.map(e=>'<span class="emoji-pick" onclick="event.stopPropagation();setFolderIcon('+folder.id+',\''+e+'\')">'+e+'</span>').join('')+'<span class="emoji-pick" onclick="event.stopPropagation();setFolderIcon('+folder.id+',\'\')">❌</span></div></span><textarea class="folder-name" rows="1" oninput="autoGrow(this)" onchange="renameFolder('+folder.id+',this)" onfocus="cursorToEnd(this)" onclick="event.stopPropagation()">'+esc(folder.name)+'</textarea><span class="folder-count"'+(inboxHasItems?' style="background:var(--blue-bg);color:var(--blue)"':'')+'>'+undoneCount+'</span><button class="folder-copy-btn" onclick="event.stopPropagation();copyFolderTasks('+folder.id+',this)" title="📋">📋<span class="copy-ok">'+t('copied')+'</span></button><button class="folder-btn" onclick="event.stopPropagation();removeFolder('+folder.id+')" title="🗑">🗑</button></div>';
+fhtml+='<div class="folder'+(inboxHasItems?' inbox-active':'')+(collapsed?' folder-collapsed':'')+'" data-folder-id="'+folder.id+'"><div class="folder-head" '+folderHeadStyle+' draggable="true" ondragstart="onFolderDragStart(event,'+folder.id+')" ondragend="onFolderDragEnd(event)" onclick="toggleFolder('+folder.id+')"><svg class="folder-chevron'+(collapsed?'':' open')+'" width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2l5 4-5 4z"/></svg><span class="folder-icon-btn" style="position:relative" onclick="event.stopPropagation();toggleEmojiPicker('+folder.id+')" title="Icon">'+((icon||'📁'))+'<div class="emoji-picker" id="emojiPick_'+folder.id+'">'+EMOJIS.map(e=>'<span class="emoji-pick" onclick="event.stopPropagation();setFolderIcon('+folder.id+',\''+e+'\')">'+e+'</span>').join('')+'<span class="emoji-pick" onclick="event.stopPropagation();setFolderIcon('+folder.id+',\'\')">❌</span></div></span><textarea class="folder-name" rows="1" oninput="autoGrow(this)" onchange="renameFolder('+folder.id+',this)" onfocus="cursorToEnd(this)" onclick="event.stopPropagation()">'+esc(folder.name)+'</textarea><span class="folder-count"'+(inboxHasItems?' style="background:var(--blue-bg);color:var(--blue)"':'')+'>'+undoneCount+'</span><div class="folder-head-actions"><button class="folder-copy-btn" onclick="event.stopPropagation();copyFolderTasks('+folder.id+',this)" title="📋">📋<span class="copy-ok">'+t('copied')+'</span></button><button class="folder-btn" onclick="event.stopPropagation();removeFolder('+folder.id+')" title="🗑">🗑</button></div></div>';
 fhtml+='<textarea class="folder-desc'+(collapsed?' collapsed-hidden':'')+'" rows="1" placeholder="'+t('folderDescPh')+'" oninput="autoGrow(this)" onchange="setFolderDesc('+folder.id+',this.value)" onfocus="cursorToEnd(this);autoGrow(this)" onclick="event.stopPropagation()">'+esc(folder.desc||'')+'</textarea>';
 fhtml+='<div class="folder-body'+(collapsed?' collapsed':'')+'" style="'+(collapsed?'':'max-height:9999px')+'">';
 if(fTasks.length)fhtml+=fTasks.map(tt=>taskHTML(tt,false)).join("");
@@ -745,45 +746,37 @@ fc.innerHTML=fhtml;
 const dn=S.tasks.filter(tt=>tt.done).length;const tc=S.tasks.filter(tt=>tt.today&&!tt.done).length;
 document.getElementById("stats").textContent=dn+" "+t('of')+" "+S.tasks.length+" "+t('doneLabel')+" · "+tc+" "+t('forToday');
 upTL();
-// Populate quick-add folder dropdown
 const qaSelect=document.getElementById('quickAddFolder');if(qaSelect){const curVal=qaSelect.value;let opts='';S.folders.forEach(f=>{const icon=f.icon||'📁';opts+='<option value="'+f.id+'">'+icon+' '+esc(f.name)+'</option>'});qaSelect.innerHTML=opts;if(curVal&&S.folders.find(f=>f.id===parseInt(curVal)))qaSelect.value=curVal;else{const inb=S.folders.find(f=>f.icon==='📥'||f.name==='Inbox');if(inb)qaSelect.value=inb.id}}
 if(doneOverviewOpen)renderDoneOverview();
 if(logPanelOpen)renderLog();
 document.querySelectorAll('.task-note,.task-title,.folder-desc,.add-task-input,.folder-name,.subtask-title').forEach(autoGrow);
-// Setup touch drag listeners for tasks in sections
 document.querySelectorAll('#nowZone .task, #todayZone .task, #waitZone .task').forEach(taskEl=>{const id=parseInt(taskEl.dataset.id);if(!id)return;let longPress=null;taskEl.addEventListener('touchstart',function(e){longPress=setTimeout(()=>{onTouchDragStart(e,id)},300)},{passive:false});taskEl.addEventListener('touchmove',function(e){if(longPress){clearTimeout(longPress);longPress=null}if(touchDragId)onTouchDragMove(e)},{passive:false});taskEl.addEventListener('touchend',function(e){if(longPress){clearTimeout(longPress);longPress=null}if(touchDragId)onTouchDragEnd(e)})});
 }
 function autoGrow(el){if(!el)return;el.style.height='auto';el.style.height=Math.max(16,el.scrollHeight)+'px'}
 
 /* ===== CLICK OUTSIDE TO COLLAPSE TASK ===== */
-// Prevent drag when interacting with text fields
 document.addEventListener('mousedown',function(e){
 const tgt=e.target;if(tgt.tagName==='TEXTAREA'||tgt.tagName==='INPUT'){const task=tgt.closest('.task');if(task)task.setAttribute('draggable','false')}});
 document.addEventListener('mouseup',function(){document.querySelectorAll('.task[draggable="false"]').forEach(el=>el.setAttribute('draggable','true'))});
 document.addEventListener('dragend',function(){document.querySelectorAll('.task[draggable="false"]').forEach(el=>el.setAttribute('draggable','true'))});
 document.addEventListener('click',function(e){
 const clickedTask=e.target.closest('.task');
-// Collapse all other expanded tasks
 document.querySelectorAll('.task').forEach(taskEl=>{
 if(taskEl===clickedTask)return;
-// Check if this task has visible notes/rows (meaning it's expanded)
 const visibleNotes=taskEl.querySelectorAll('.task-note:not(.hidden-note)');
 const visibleRows=taskEl.querySelectorAll('.task-row:not(.hidden-row)');
 const stWrap=taskEl.querySelector('.subtasks-wrap');
 if(visibleNotes.length||visibleRows.length||stWrap){
 const tid=parseInt(taskEl.dataset.id);const tt=S.tasks.find(x=>x.id===tid);
-// Hide notes
 taskEl.querySelectorAll('.task-note').forEach(n=>n.classList.add('hidden-note'));
 taskEl.querySelectorAll('.task-row').forEach(r=>r.classList.add('hidden-row'));
-// Restore hints for notes and/or subtasks
 const hasNote=tt&&tt.note;const hasSubtasks=tt&&tt.subtasks&&tt.subtasks.length>0;
 taskEl.querySelectorAll('.task-note-hint').forEach(h=>{if(hasNote||hasSubtasks){h.innerHTML=noteHintSVG();h.style.display=''}else{h.style.display='none'}});
-// Remove subtasks wrap (compact = no subtasks visible)
 if(stWrap)stWrap.remove();
-// Remove any standalone add-subtask buttons
 taskEl.querySelectorAll('.add-subtask-btn').forEach(b=>b.remove());
 }});
 },{capture:false});
 </script>
+
 </body>
 </html>
