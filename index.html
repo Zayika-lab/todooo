@@ -110,10 +110,15 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 .tl-ok{background:var(--accent)}.tl-warn{background:var(--warn)}.tl-over{background:var(--warn)}.tl-gray{background:var(--tx3)}
 
 /* Quick add */
-.quick-add{display:flex;gap:4px;margin-bottom:8px;align-items:center}
-.quick-add input{flex:1;padding:7px 10px;font-size:14px;border-radius:var(--rad-lg);border:1px solid var(--bd1);background:var(--bg1)}
+.quick-add{display:flex;gap:4px;margin-bottom:8px;align-items:center;flex-wrap:wrap}
+.quick-add input{flex:1;padding:7px 10px;font-size:14px;border-radius:var(--rad-lg);border:1px solid var(--bd1);background:var(--bg1);min-width:120px}
 .quick-add input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-bg)}
 .quick-add button{padding:7px 14px;border-radius:var(--rad-lg);background:var(--accent);color:#fff;font-size:14px;font-weight:600;border:none}
+.qa-toggle{padding:3px 7px;border-radius:var(--btn-rad);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .1s;border:1px solid transparent;background:none;line-height:1.6}
+.qa-toggle.now-l{color:var(--accent)}
+.qa-toggle.now-l:hover,.qa-toggle.now-l.active{background:var(--accent-bg);border-color:var(--accent-bd)}
+.qa-toggle.today-l{color:var(--tx2)}
+.qa-toggle.today-l.active{color:#fff;background:var(--blue);border-color:var(--blue)}
 
 /* Sections (Jetzt, Heute, Warten) */
 .section{background:var(--bg1);border:1px solid var(--bd3);border-radius:var(--rad-lg);margin-bottom:8px;box-shadow:var(--shadow);overflow:visible}
@@ -196,6 +201,24 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 
 /* Subtasks */
 .subtasks-wrap{margin-top:3px}
+.subtask-block{border:1px solid var(--bd3);border-radius:var(--rad);margin:4px 0;overflow:hidden;background:var(--bg2)}
+.subtask-block.waiting-block{border-color:var(--wait-bd);opacity:.7;background:var(--wait-bg)}
+.subtask-block-head{display:flex;align-items:center;gap:5px;padding:4px 8px;font-size:11px;color:var(--tx1);background:var(--bg3);border-bottom:1px solid var(--bd3)}
+.subtask-block.waiting-block .subtask-block-head{background:var(--wait-bg)}
+.subtask-block-date{width:120px;font-size:11px;padding:1px 3px;border:1px solid var(--bd1);border-radius:var(--rad);background:var(--bg1);color:var(--tx0)}
+.subtask-block-wait-btn{font-size:11px;padding:1px 5px;border-radius:var(--btn-rad);border:1px solid var(--wait-bd);background:none;color:var(--wait);cursor:pointer;line-height:1.4}
+.subtask-block-wait-btn:hover,.subtask-block-wait-btn.active{background:var(--wait-bg);border-color:var(--wait)}
+.subtask-block-rm{font-size:13px;color:var(--tx3);cursor:pointer;background:none;border:none;padding:0 3px;margin-left:auto}
+.subtask-block-rm:hover{color:var(--danger)}
+.subtask-block-body{padding:2px 4px}
+.subtask-item{display:flex;align-items:flex-start;gap:4px;padding:2px 4px;border-bottom:1px solid var(--bd3)}
+.subtask-item:last-child{border-bottom:none}
+.subtask-item-note{padding-left:24px;border-bottom:1px solid var(--bd3)}
+.subtask-item-note:last-child{border-bottom:none}
+.subtask-item-text{font-size:12px;color:var(--tx1);padding:3px 4px 3px 24px;font-style:italic}
+.subtask-block-actions{display:flex;gap:4px;padding:3px 8px;border-top:1px solid var(--bd3)}
+.subtask-block-actions button{font-size:10px;color:var(--tx2);cursor:pointer;background:none;border:1px dashed var(--bd1);border-radius:var(--rad);padding:2px 8px}
+.subtask-block-actions button:hover{color:var(--accent);border-color:var(--accent)}
 .subtask{display:flex;flex-direction:column;gap:1px;padding:3px 0;font-size:13px;border-bottom:1px solid var(--bd3)}
 .subtask:last-child{border-bottom:none}
 .subtask-date-row{display:flex;align-items:center;gap:5px}
@@ -497,6 +520,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 
   <div class="quick-add">
     <input type="text" id="quickAddInput" data-i18n-ph="quickAddPh" placeholder="Швидке завдання…" onkeydown="if(event.key==='Enter'){quickAdd()}"/>
+    <button class="qa-toggle now-l" id="qaToggleNow" onclick="this.classList.toggle('active')" title="⚡">⚡</button>
+    <button class="qa-toggle today-l" id="qaToggleToday" onclick="this.classList.toggle('active')" title="📅">📅</button>
     <select id="quickAddFolder" style="font-size:12px;padding:5px 4px;border-radius:var(--rad-lg);border:1px solid var(--bd1);background:var(--bg1);color:var(--tx0);max-width:120px"></select>
     <button onclick="quickAdd()">+</button>
   </div>
@@ -545,8 +570,8 @@ function showModal(opts){return new Promise(resolve=>{const ov=document.createEl
 
 /* ===== I18N ===== */
 const LANG={
-uk:{loginSubtitle:"Увійди, щоб зберігати завдання в хмарі",loginBtn:"Увійти з Google",openBrowser:"Відкрити у браузері",tgNote:"Telegram-браузер не підтримує Google Login.",logoutBtn:"Вийти",fromLabel:"Від:",deadlineLabel:"До:",fromNow:"Від зараз",setBtn:"✓",nowLabel:"Зараз",notSet:"Не встановлено",tagsTitle:"Теги",newFolder:"Нова папка",addTagPh:"+ тег…",newTaskPh:"Нове завдання…",quickAddPh:"Швидке завдання → Inbox…",dragHere:"⤵",done:"Зроблені",deleteTask:"Видалити завдання?",deleteFolder:"Видалити папку?",folderNamePrompt:"Назва папки:",needOneFolder:"Потрібна хоча б одна папка",now:"зараз",today:"сьогодні",wait:"чекаю",min:"хв",hourShort:"год",hourWithMin:"г",of:"з",doneLabel:"зроблено",forToday:"на сьогодні",available:"Доступно",todayLabel:"Сьогодні",reserve:"Запас",missing:"Бракує",tasksToday:"Завдань на сьогодні",prioUrgent:"ТЕРМ.",prioImportant:"ВАЖЛ.",prioMedium:"СЕРЕД.",prioLow:"НИЗЬК.",prioNew:"НОВЕ",prioUrgentL:"🔴 Терміново",prioImportantL:"🟠 Важливо",prioMediumL:"🟢 Середнє",prioLowL:"⚪ Низький",tagLabel:"🏷",deleteTag:"Видалити тег?",folderDescPh:"Опис…",copied:"✓",doneOverview:"✓ Виконані",doneToday:"Сьогодні",doneYesterday:"Вчора",doneDaysAgo:"д. тому",deadlinePassed:"Дедлайн минув",inbox:"📥 Inbox",deepFocus:"🎯 Фокус",exitFocus:"✕ Вийти з фокусу",waitSection:"⏳ Очікування",startTimer:"▶",stopTimer:"⏸",copyTask:"📋",scrollToFolder:"↓",addSubtask:"+ підпункт",searchPh:"Пошук завдань…",emptyTitle:"Все зроблено!",emptyHint:"Додай нове завдання кнопкою + знизу",confirmDeleteTask:"Справді видалити це завдання?",confirmDeleteFolder:"Справді видалити цю папку?",confirmDeleteTag:"Справді видалити цей тег?",modalOk:"OK",modalCancel:"Скасувати",modalDelete:"Видалити",timerPrompt:"Таймер (хв):",folderNameTitle:"Назва папки"},
-de:{loginSubtitle:"Anmelden, um Aufgaben zu speichern",loginBtn:"Mit Google anmelden",openBrowser:"Im Browser öffnen",tgNote:"Telegram unterstützt kein Google Login.",logoutBtn:"Abmelden",fromLabel:"Von:",deadlineLabel:"Bis:",fromNow:"Ab jetzt",setBtn:"✓",nowLabel:"Jetzt",notSet:"Nicht gesetzt",tagsTitle:"Tags",newFolder:"Neuer Ordner",addTagPh:"+ Tag…",newTaskPh:"Neue Aufgabe…",quickAddPh:"Schnelle Aufgabe → Inbox…",dragHere:"⤵",done:"Erledigt",deleteTask:"Aufgabe löschen?",deleteFolder:"Ordner löschen?",folderNamePrompt:"Ordnername:",needOneFolder:"Min. ein Ordner nötig",now:"jetzt",today:"heute",wait:"warten",min:"Min",hourShort:"St.",hourWithMin:"St.",of:"von",doneLabel:"erledigt",forToday:"für heute",available:"Verfügbar",todayLabel:"Heute",reserve:"Reserve",missing:"Fehlt",tasksToday:"Aufgaben heute",prioUrgent:"DRING.",prioImportant:"WICHT.",prioMedium:"MITTEL",prioLow:"NIEDR.",prioNew:"NEU",prioUrgentL:"🔴 Dringend",prioImportantL:"🟠 Wichtig",prioMediumL:"🟢 Mittel",prioLowL:"⚪ Niedrig",tagLabel:"🏷",deleteTag:"Tag löschen?",folderDescPh:"Beschreibung…",copied:"✓",doneOverview:"✓ Erledigt",doneToday:"Heute",doneYesterday:"Gestern",doneDaysAgo:"T. her",deadlinePassed:"Frist abgelaufen",inbox:"📥 Inbox",deepFocus:"🎯 Fokus",exitFocus:"✕ Fokus beenden",waitSection:"⏳ Warten",startTimer:"▶",stopTimer:"⏸",copyTask:"📋",scrollToFolder:"↓",addSubtask:"+ Unterpunkt",searchPh:"Aufgaben suchen…",emptyTitle:"Alles erledigt!",emptyHint:"Neue Aufgabe mit + unten hinzufügen",confirmDeleteTask:"Diese Aufgabe wirklich löschen?",confirmDeleteFolder:"Diesen Ordner wirklich löschen?",confirmDeleteTag:"Diesen Tag wirklich löschen?",modalOk:"OK",modalCancel:"Abbrechen",modalDelete:"Löschen",timerPrompt:"Timer (Min):",folderNameTitle:"Ordnername"}
+uk:{loginSubtitle:"Увійди, щоб зберігати завдання в хмарі",loginBtn:"Увійти з Google",openBrowser:"Відкрити у браузері",tgNote:"Telegram-браузер не підтримує Google Login.",logoutBtn:"Вийти",fromLabel:"Від:",deadlineLabel:"До:",fromNow:"Від зараз",setBtn:"✓",nowLabel:"Зараз",notSet:"Не встановлено",tagsTitle:"Теги",newFolder:"Нова папка",addTagPh:"+ тег…",newTaskPh:"Нове завдання…",quickAddPh:"Швидке завдання → Inbox…",dragHere:"⤵",done:"Зроблені",deleteTask:"Видалити завдання?",deleteFolder:"Видалити папку?",folderNamePrompt:"Назва папки:",needOneFolder:"Потрібна хоча б одна папка",now:"зараз",today:"сьогодні",wait:"чекаю",min:"хв",hourShort:"год",hourWithMin:"г",of:"з",doneLabel:"зроблено",forToday:"на сьогодні",available:"Доступно",todayLabel:"Сьогодні",reserve:"Запас",missing:"Бракує",tasksToday:"Завдань на сьогодні",prioUrgent:"ТЕРМ.",prioImportant:"ВАЖЛ.",prioMedium:"СЕРЕД.",prioLow:"НИЗЬК.",prioNew:"НОВЕ",prioUrgentL:"🔴 Терміново",prioImportantL:"🟠 Важливо",prioMediumL:"🟢 Середнє",prioLowL:"⚪ Низький",tagLabel:"🏷",deleteTag:"Видалити тег?",folderDescPh:"Опис…",copied:"✓",doneOverview:"✓ Виконані",doneToday:"Сьогодні",doneYesterday:"Вчора",doneDaysAgo:"д. тому",deadlinePassed:"Дедлайн минув",inbox:"📥 Inbox",deepFocus:"🎯 Фокус",exitFocus:"✕ Вийти з фокусу",waitSection:"⏳ Очікування",startTimer:"▶",stopTimer:"⏸",copyTask:"📋",scrollToFolder:"↓",addSubtask:"+ підпункт",searchPh:"Пошук завдань…",emptyTitle:"Все зроблено!",emptyHint:"Додай нове завдання кнопкою + знизу",confirmDeleteTask:"Справді видалити це завдання?",confirmDeleteFolder:"Справді видалити цю папку?",confirmDeleteTag:"Справді видалити цей тег?",modalOk:"OK",modalCancel:"Скасувати",modalDelete:"Видалити",timerPrompt:"Таймер (хв):",folderNameTitle:"Назва папки",addBlock:"+ блок",addItem:"+ запис",addItemNote:"📝 нотатка",blockDatePh:"Дата блоку",deleteBlock:"Видалити блок?",deleteItem:"×"},
+de:{loginSubtitle:"Anmelden, um Aufgaben zu speichern",loginBtn:"Mit Google anmelden",openBrowser:"Im Browser öffnen",tgNote:"Telegram unterstützt kein Google Login.",logoutBtn:"Abmelden",fromLabel:"Von:",deadlineLabel:"Bis:",fromNow:"Ab jetzt",setBtn:"✓",nowLabel:"Jetzt",notSet:"Nicht gesetzt",tagsTitle:"Tags",newFolder:"Neuer Ordner",addTagPh:"+ Tag…",newTaskPh:"Neue Aufgabe…",quickAddPh:"Schnelle Aufgabe → Inbox…",dragHere:"⤵",done:"Erledigt",deleteTask:"Aufgabe löschen?",deleteFolder:"Ordner löschen?",folderNamePrompt:"Ordnername:",needOneFolder:"Min. ein Ordner nötig",now:"jetzt",today:"heute",wait:"warten",min:"Min",hourShort:"St.",hourWithMin:"St.",of:"von",doneLabel:"erledigt",forToday:"für heute",available:"Verfügbar",todayLabel:"Heute",reserve:"Reserve",missing:"Fehlt",tasksToday:"Aufgaben heute",prioUrgent:"DRING.",prioImportant:"WICHT.",prioMedium:"MITTEL",prioLow:"NIEDR.",prioNew:"NEU",prioUrgentL:"🔴 Dringend",prioImportantL:"🟠 Wichtig",prioMediumL:"🟢 Mittel",prioLowL:"⚪ Niedrig",tagLabel:"🏷",deleteTag:"Tag löschen?",folderDescPh:"Beschreibung…",copied:"✓",doneOverview:"✓ Erledigt",doneToday:"Heute",doneYesterday:"Gestern",doneDaysAgo:"T. her",deadlinePassed:"Frist abgelaufen",inbox:"📥 Inbox",deepFocus:"🎯 Fokus",exitFocus:"✕ Fokus beenden",waitSection:"⏳ Warten",startTimer:"▶",stopTimer:"⏸",copyTask:"📋",scrollToFolder:"↓",addSubtask:"+ Unterpunkt",searchPh:"Aufgaben suchen…",emptyTitle:"Alles erledigt!",emptyHint:"Neue Aufgabe mit + unten hinzufügen",confirmDeleteTask:"Diese Aufgabe wirklich löschen?",confirmDeleteFolder:"Diesen Ordner wirklich löschen?",confirmDeleteTag:"Diesen Tag wirklich löschen?",modalOk:"OK",modalCancel:"Abbrechen",modalDelete:"Löschen",timerPrompt:"Timer (Min):",folderNameTitle:"Ordnername",addBlock:"+ Block",addItem:"+ Eintrag",addItemNote:"📝 Notiz",blockDatePh:"Blockdatum",deleteBlock:"Block löschen?",deleteItem:"×"}
 };
 let curLang=localStorage.getItem('todooo_lang')||'uk';
 function t(key){return(LANG[curLang]&&LANG[curLang][key])||LANG.uk[key]||key}
@@ -586,12 +611,40 @@ function renderLog(){const p=document.getElementById('logPanel');if(!logPanelOpe
 /* ===== SEARCH ===== */
 let searchPanelOpen=false;
 function toggleSearchPanel(){searchPanelOpen=!searchPanelOpen;document.getElementById('searchBtn').classList.toggle('active',searchPanelOpen);const panel=document.getElementById('searchPanel');if(searchPanelOpen){panel.classList.add('open');setTimeout(()=>document.getElementById('searchInput').focus(),50)}else{panel.classList.remove('open');document.getElementById('searchInput').value='';document.getElementById('searchResults').innerHTML=''}}
-function onSearchInput(val){const res=document.getElementById('searchResults');if(!val.trim()){res.innerHTML='';return}const q=val.toLowerCase();const matched=S.tasks.filter(tt=>{if(tt.done)return false;const titleMatch=tt.title&&tt.title.toLowerCase().includes(q);const noteMatch=tt.note&&tt.note.toLowerCase().includes(q);const subMatch=tt.subtasks&&tt.subtasks.some(st=>st.title&&st.title.toLowerCase().includes(q));return titleMatch||noteMatch||subMatch});if(!matched.length){res.innerHTML='';return}res.innerHTML=matched.slice(0,15).map(tt=>{const folder=S.folders.find(f=>f.id===tt.folderId);const fn=folder?esc(folder.name):'?';const fi=folder&&folder.icon?folder.icon:'📁';const c=gc(tt.pc);const doneClass=tt.done?' style="text-decoration:line-through;opacity:.5"':'';return'<div class="search-result-item" onclick="searchGoToTask('+tt.id+')"><span class="prio-badge" style="background:'+c.bg+';color:'+c.tx+';border-color:'+c.bd+';font-size:8px;padding:0 4px">'+esc(getPrioMap()[tt.pc]||'')+'</span><span'+doneClass+'>'+esc(tt.title)+'</span><span class="search-result-folder">'+fi+' '+fn+'</span></div>'}).join('')}
+function onSearchInput(val){const res=document.getElementById('searchResults');if(!val.trim()){res.innerHTML='';return}const q=val.toLowerCase();const matched=S.tasks.filter(tt=>{if(tt.done)return false;const titleMatch=tt.title&&tt.title.toLowerCase().includes(q);const noteMatch=tt.note&&tt.note.toLowerCase().includes(q);const subMatch=tt.subtasks&&tt.subtasks.some(b=>b.items&&b.items.some(i=>i.title&&i.title.toLowerCase().includes(q)));return titleMatch||noteMatch||subMatch});if(!matched.length){res.innerHTML='';return}res.innerHTML=matched.slice(0,15).map(tt=>{const folder=S.folders.find(f=>f.id===tt.folderId);const fn=folder?esc(folder.name):'?';const fi=folder&&folder.icon?folder.icon:'📁';const c=gc(tt.pc);const doneClass=tt.done?' style="text-decoration:line-through;opacity:.5"':'';return'<div class="search-result-item" onclick="searchGoToTask('+tt.id+')"><span class="prio-badge" style="background:'+c.bg+';color:'+c.tx+';border-color:'+c.bd+';font-size:8px;padding:0 4px">'+esc(getPrioMap()[tt.pc]||'')+'</span><span'+doneClass+'>'+esc(tt.title)+'</span><span class="search-result-folder">'+fi+' '+fn+'</span></div>'}).join('')}
 function searchGoToTask(id){const tt=S.tasks.find(x=>x.id===id);if(!tt)return;const folder=S.folders.find(f=>f.id===tt.folderId);if(folder&&folder.collapsed){folder.collapsed=false;render();setTimeout(()=>searchGoToTask(id),100);return}const el=document.querySelector('#foldersContainer .task[data-id="'+id+'"]');if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='2px solid var(--accent)';setTimeout(()=>el.style.outline='',1500)}toggleSearchPanel()}
+
+/* ===== SUBTASK MIGRATION & SYNC ===== */
+function migrateSubtasks(subtasks){
+if(!subtasks||!subtasks.length)return[];
+// Check if already in new block format (has items array)
+if(subtasks[0]&&Array.isArray(subtasks[0].items))return subtasks;
+// Old format: [{id, title, date, done, doneAt}] → group by date into blocks
+const groups={};
+subtasks.forEach(st=>{
+const key=st.date||'__none__';
+if(!groups[key])groups[key]=[];
+groups[key].push(st);
+});
+const blocks=[];
+for(const key of Object.keys(groups)){
+const items=groups[key].map(st=>({id:st.id,title:st.title||'',done:!!st.done,doneAt:st.doneAt||null,hasCheckbox:true}));
+blocks.push({id:Date.now()+Math.floor(Math.random()*10000)+blocks.length,date:key==='__none__'?null:key,waiting:false,items:items});
+}
+return blocks;
+}
+function syncTaskWaitingFromSubtasks(taskId){
+const tt=S.tasks.find(x=>x.id===taskId);
+if(!tt||!tt.subtasks)return;
+const anyWaiting=tt.subtasks.some(b=>b.waiting);
+tt.waiting=anyWaiting;
+if(anyWaiting){tt.now=false;tt.today=false;tt.timerRunning=false}
+}
 
 /* ===== SAVE/LOAD ===== */
 function save(){if(!DOC_REF)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>{DOC_REF.set({tasks:S.tasks,folders:S.folders,tags:S.tags||[],deadline:S.deadline,timeFrom:S.timeFrom||null,nextId:S.nextId,nextFolderId:S.nextFolderId,nextTagId:S.nextTagId||1}).then(()=>syncSt("ok","☁️")).catch(e=>{console.error(e);syncSt("err","⚠️")})},400)}
-async function loadFromCloud(){if(!DOC_REF)return;syncSt("load","🔄");try{const snap=await DOC_REF.get();if(snap.exists){const d=snap.data();S.tasks=Array.isArray(d.tasks)?d.tasks:[];S.folders=Array.isArray(d.folders)?d.folders:[];S.tags=Array.isArray(d.tags)?d.tags:[];S.deadline=typeof d.deadline==='number'?d.deadline:null;S.timeFrom=typeof d.timeFrom==='number'?d.timeFrom:null;S.nextId=typeof d.nextId==='number'?d.nextId:100;S.nextFolderId=typeof d.nextFolderId==='number'?d.nextFolderId:10;S.nextTagId=typeof d.nextTagId==='number'?d.nextTagId:1;S.tasks=S.tasks.filter(t=>t&&typeof t==='object'&&typeof t.id==='number');S.folders=S.folders.filter(f=>f&&typeof f==='object'&&typeof f.id==='number');S.tags=S.tags.filter(tg=>tg&&typeof tg==='object'&&typeof tg.id==='number');if(!S.folders.length)S.folders=[{id:1,name:"Inbox",order:0,doneOpen:false,collapsed:false,desc:'',icon:'📥'}];const folderIds=new Set(S.folders.map(f=>f.id));S.tasks.forEach(t=>{if(t.folderId===undefined||!folderIds.has(t.folderId))t.folderId=S.folders[0].id;if(t.today===undefined)t.today=false;if(!Array.isArray(t.tags))t.tags=[];if(t.doneAt===undefined)t.doneAt=null;if(t.waiting===undefined)t.waiting=false;if(t.waitUntil===undefined)t.waitUntil=null;if(t.timerStart===undefined)t.timerStart=null;if(t.timerRunning===undefined)t.timerRunning=false;if(!Array.isArray(t.subtasks))t.subtasks=[];if(t.nowOrder===undefined)t.nowOrder=0;if(t.todayOrder===undefined)t.todayOrder=0;if(typeof t.title!=='string')t.title=String(t.title||'');if(typeof t.note!=='string')t.note=String(t.note||'')});S.folders.forEach(f=>{if(f.collapsed===undefined)f.collapsed=false;if(f.desc===undefined)f.desc='';if(f.icon===undefined)f.icon='';if(f.folderType===undefined)f.folderType='';if(typeof f.name!=='string')f.name=String(f.name||'Folder')});if(S.deadline){setDateInput('deadline',S.deadline)}if(S.timeFrom){setDateInput('timeFrom',S.timeFrom)}}else{S.folders=[{id:1,name:"Inbox",order:0,doneOpen:false,desc:'',collapsed:false,icon:'📥'}]}syncSt("ok","☁️");render();checkTimersAndStart()}catch(e){console.error(e);syncSt("err","⚠️");render()}}
+async function loadFromCloud(){if(!DOC_REF)return;syncSt("load","🔄");try{const snap=await DOC_REF.get();if(snap.exists){const d=snap.data();S.tasks=Array.isArray(d.tasks)?d.tasks:[];S.folders=Array.isArray(d.folders)?d.folders:[];S.tags=Array.isArray(d.tags)?d.tags:[];S.deadline=typeof d.deadline==='number'?d.deadline:null;S.timeFrom=typeof d.timeFrom==='number'?d.timeFrom:null;S.nextId=typeof d.nextId==='number'?d.nextId:100;S.nextFolderId=typeof d.nextFolderId==='number'?d.nextFolderId:10;S.nextTagId=typeof d.nextTagId==='number'?d.nextTagId:1;S.tasks=S.tasks.filter(t=>t&&typeof t==='object'&&typeof t.id==='number');S.folders=S.folders.filter(f=>f&&typeof f==='object'&&typeof f.id==='number');S.tags=S.tags.filter(tg=>tg&&typeof tg==='object'&&typeof tg.id==='number');if(!S.folders.length)S.folders=[{id:1,name:"Inbox",order:0,doneOpen:false,collapsed:false,desc:'',icon:'📥'}];const folderIds=new Set(S.folders.map(f=>f.id));S.tasks.forEach(t=>{if(t.folderId===undefined||!folderIds.has(t.folderId))t.folderId=S.folders[0].id;if(t.today===undefined)t.today=false;if(!Array.isArray(t.tags))t.tags=[];if(t.doneAt===undefined)t.doneAt=null;if(t.waiting===undefined)t.waiting=false;if(t.waitUntil===undefined)t.waitUntil=null;if(t.timerStart===undefined)t.timerStart=null;if(t.timerRunning===undefined)t.timerRunning=false;if(!Array.isArray(t.subtasks))t.subtasks=[];
+t.subtasks=migrateSubtasks(t.subtasks);if(t.nowOrder===undefined)t.nowOrder=0;if(t.todayOrder===undefined)t.todayOrder=0;if(typeof t.title!=='string')t.title=String(t.title||'');if(typeof t.note!=='string')t.note=String(t.note||'')});S.folders.forEach(f=>{if(f.collapsed===undefined)f.collapsed=false;if(f.desc===undefined)f.desc='';if(f.icon===undefined)f.icon='';if(f.folderType===undefined)f.folderType='';if(typeof f.name!=='string')f.name=String(f.name||'Folder')});if(S.deadline){setDateInput('deadline',S.deadline)}if(S.timeFrom){setDateInput('timeFrom',S.timeFrom)}}else{S.folders=[{id:1,name:"Inbox",order:0,doneOpen:false,desc:'',collapsed:false,icon:'📥'}]}syncSt("ok","☁️");render();checkTimersAndStart()}catch(e){console.error(e);syncSt("err","⚠️");render()}}
 function setDateInput(id,ts){const dt=new Date(ts),p=n=>String(n).padStart(2,'0');document.getElementById(id).value=dt.getFullYear()+'-'+p(dt.getMonth()+1)+'-'+p(dt.getDate())+'T'+p(dt.getHours())+':'+p(dt.getMinutes())}
 
 /* ===== HELPERS ===== */
@@ -609,7 +662,7 @@ function setFromNow(){const p=n=>String(n).padStart(2,'0');const now=new Date();
 function upTL(){const fill=document.getElementById("tlFill"),info=document.getElementById("timeInfo"),lb=document.getElementById("dlLabel"),fl=document.getElementById("fromLabel2");const todayTasks=S.tasks.filter(t=>!t.done&&t.today&&!t.waiting);const tot=todayTasks.reduce((s,t)=>s+(t.mins||0),0);const tlCard=document.querySelector('.tl-card');if(tlCard){if(!S.deadline&&todayTasks.length===0){tlCard.style.display='none';return}else{tlCard.style.display=''}}if(S.timeFrom&&S.timeFrom<Date.now())S.timeFrom=Date.now();fl.textContent=S.timeFrom?new Date(S.timeFrom).toLocaleTimeString(curLang==='de'?'de':'uk',{hour:'2-digit',minute:'2-digit'}):t('nowLabel');if(!S.deadline){fill.style.width="0%";fill.className="tl-bar-fill";info.innerHTML=t('tasksToday')+": <b>"+fm(tot)+"</b>";lb.textContent=t('notSet');return}const from=S.timeFrom||Date.now();const avail=Math.max(0,Math.round((S.deadline-Math.max(from,Date.now()))/60000));const deadlinePassed=S.deadline<Date.now();if(deadlinePassed&&todayTasks.length===0){fill.style.width="100%";fill.className="tl-bar-fill tl-gray";lb.textContent=t('deadlinePassed');info.innerHTML=t('deadlinePassed');return}const pct=avail>0?Math.min(100,Math.round(tot/avail*100)):100;fill.style.width=pct+"%";fill.className="tl-bar-fill "+(deadlinePassed?"tl-gray":pct<=60?"tl-ok":"tl-warn");lb.textContent=new Date(S.deadline).toLocaleString(curLang==='de'?"de-DE":"uk-UA",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});const fr=avail-tot;info.innerHTML=t('available')+": <b>"+fm(avail)+"</b> · "+t('todayLabel')+": <b>"+fm(tot)+"</b> · "+(fr>=0?t('reserve')+": <b>"+fm(fr)+"</b>":"<span style='color:var(--warn);font-weight:600'>"+t('missing')+" "+fm(Math.abs(fr))+"</span>")}
 
 /* ===== QUICK ADD (Inbox) ===== */
-function quickAdd(){const inp=document.getElementById('quickAddInput');const v=inp.value.trim();if(!v)return;pushUndo();const selFolder=document.getElementById('quickAddFolder');const selFid=selFolder?parseInt(selFolder.value):null;let targetFolder=selFid?S.folders.find(f=>f.id===selFid):null;if(!targetFolder){targetFolder=S.folders.find(f=>f.name==='Inbox'||f.icon==='📥');if(!targetFolder){targetFolder={id:S.nextFolderId++,name:'Inbox',order:-1,doneOpen:false,collapsed:false,desc:'',icon:'📥'};S.folders.unshift(targetFolder)}}localStorage.setItem('reasons_lastFabFolder',String(targetFolder.id));S.tasks.push({id:S.nextId++,folderId:targetFolder.id,done:false,prio:t('prioNew'),pc:"gray",title:v,note:"",mins:0,now:false,today:false,tags:[],doneAt:null,waiting:false,waitUntil:null,timerStart:null,timerRunning:false,subtasks:[],nowOrder:0,todayOrder:0});inp.value="";logAction('quickAdd',v);render();save();inp.focus()}
+function quickAdd(){const inp=document.getElementById('quickAddInput');const v=inp.value.trim();if(!v)return;pushUndo();const selFolder=document.getElementById('quickAddFolder');const selFid=selFolder?parseInt(selFolder.value):null;let targetFolder=selFid?S.folders.find(f=>f.id===selFid):null;if(!targetFolder){targetFolder=S.folders.find(f=>f.name==='Inbox'||f.icon==='📥');if(!targetFolder){targetFolder={id:S.nextFolderId++,name:'Inbox',order:-1,doneOpen:false,collapsed:false,desc:'',icon:'📥'};S.folders.unshift(targetFolder)}}localStorage.setItem('reasons_lastFabFolder',String(targetFolder.id));const qaNow=document.getElementById('qaToggleNow');const qaToday=document.getElementById('qaToggleToday');const isNow=qaNow&&qaNow.classList.contains('active');const isToday=qaToday&&qaToday.classList.contains('active');S.tasks.push({id:S.nextId++,folderId:targetFolder.id,done:false,prio:t('prioNew'),pc:"gray",title:v,note:"",mins:0,now:isNow,today:isToday,tags:[],doneAt:null,waiting:false,waitUntil:null,timerStart:null,timerRunning:false,subtasks:[],nowOrder:0,todayOrder:0});inp.value="";logAction('quickAdd',v);render();save();inp.focus()}
 
 async function fabQuickAdd(){
 const lastFid=parseInt(localStorage.getItem('reasons_lastFabFolder'))||0;
@@ -619,21 +672,22 @@ if(!result||!result.title.trim())return;
 pushUndo();
 const targetFolder=S.folders.find(f=>f.id===result.folderId)||S.folders[0];
 localStorage.setItem('reasons_lastFabFolder',String(targetFolder.id));
-S.tasks.push({id:S.nextId++,folderId:targetFolder.id,done:false,prio:t('prioNew'),pc:"gray",title:result.title.trim(),note:"",mins:0,now:false,today:false,tags:[],doneAt:null,waiting:false,waitUntil:null,timerStart:null,timerRunning:false,subtasks:[],nowOrder:0,todayOrder:0});
+S.tasks.push({id:S.nextId++,folderId:targetFolder.id,done:false,prio:t('prioNew'),pc:"gray",title:result.title.trim(),note:"",mins:0,now:!!result.now,today:!!result.today,tags:[],doneAt:null,waiting:false,waitUntil:null,timerStart:null,timerRunning:false,subtasks:[],nowOrder:0,todayOrder:0});
 logAction('quickAdd',result.title.trim());render();save()}
 
 function showFabModal(defaultFolderId){return new Promise(resolve=>{
 const ov=document.createElement('div');ov.className='modal-overlay';
 const box=document.createElement('div');box.className='modal-box';
 let opts='';S.folders.forEach(f=>{const icon=f.icon||'📁';const sel=f.id===defaultFolderId?' selected':'';opts+='<option value="'+f.id+'"'+sel+'>'+icon+' '+esc(f.name)+'</option>'});
-box.innerHTML='<div class="modal-title">'+t('quickAddPh')+'</div><input type="text" class="modal-input" id="fabModalInput" placeholder="'+t('quickAddPh')+'"/><div style="margin-top:8px"><select class="modal-input" id="fabModalFolder" style="width:100%;font-size:13px">'+opts+'</select></div><div class="modal-btns"><button class="modal-btn" id="fabModalCancel">'+t('modalCancel')+'</button><button class="modal-btn primary" id="fabModalOk">OK</button></div>';
+box.innerHTML='<div class="modal-title">'+t('quickAddPh')+'</div><input type="text" class="modal-input" id="fabModalInput" placeholder="'+t('quickAddPh')+'"/><div style="margin-top:8px;display:flex;gap:6px;align-items:center"><button class="qa-toggle now-l" id="fabToggleNow" type="button" onclick="this.classList.toggle(\'active\')">⚡ '+t('now')+'</button><button class="qa-toggle today-l" id="fabToggleToday" type="button" onclick="this.classList.toggle(\'active\')">📅 '+t('today')+'</button></div><div style="margin-top:8px"><select class="modal-input" id="fabModalFolder" style="width:100%;font-size:13px">'+opts+'</select></div><div class="modal-btns"><button class="modal-btn" id="fabModalCancel">'+t('modalCancel')+'</button><button class="modal-btn primary" id="fabModalOk">OK</button></div>';
 ov.appendChild(box);document.body.appendChild(ov);
 const inp=document.getElementById('fabModalInput');
 const sel=document.getElementById('fabModalFolder');
 setTimeout(()=>{inp.focus()},50);
+function getResult(){const nowBtn=document.getElementById('fabToggleNow');const todayBtn=document.getElementById('fabToggleToday');return{title:inp.value,folderId:parseInt(sel.value),now:nowBtn&&nowBtn.classList.contains('active'),today:todayBtn&&todayBtn.classList.contains('active')}}
 function cleanup(val){ov.remove();resolve(val)}
 inp.addEventListener('keydown',e=>{
-if(e.key==='Enter'){e.preventDefault();cleanup({title:inp.value,folderId:parseInt(sel.value)})}
+if(e.key==='Enter'){e.preventDefault();cleanup(getResult())}
 if(e.key==='ArrowDown'&&e.altKey){e.preventDefault();sel.focus();sel.size=Math.min(S.folders.length,6);sel.style.position='relative'}
 if(e.key==='Escape'){cleanup(null)}
 });
@@ -643,7 +697,7 @@ if(e.key==='Escape'){sel.size=0;inp.focus()}
 });
 sel.addEventListener('change',()=>{sel.size=0;inp.focus()});
 document.getElementById('fabModalCancel').onclick=()=>cleanup(null);
-document.getElementById('fabModalOk').onclick=()=>cleanup({title:inp.value,folderId:parseInt(sel.value)});
+document.getElementById('fabModalOk').onclick=()=>cleanup(getResult());
 ov.addEventListener('click',e=>{if(e.target===ov)cleanup(null)})})}
 
 window.addEventListener('scroll',function(){const btn=document.getElementById('scrollTopBtn');if(btn)btn.style.display=window.scrollY>300?'flex':'none'});
@@ -662,14 +716,52 @@ function setNote(id,v){const tt=S.tasks.find(x=>x.id===id);if(tt)tt.note=v;save(
 function moveTaskToFolder(tid,fid){pushUndo();const tt=S.tasks.find(x=>x.id===tid);if(!tt||tt.folderId===fid)return;tt.folderId=fid;closeAllPopups();logAction('move',tt.title);render();save()}
 function copyTask(id){const tt=S.tasks.find(x=>x.id===id);if(!tt)return;navigator.clipboard.writeText(tt.title+(tt.note?'\n'+tt.note:'')).then(()=>{}).catch(()=>{})}
 
-/* ===== SUBTASKS ===== */
-function addSubtask(taskId){const tt=S.tasks.find(x=>x.id===taskId);if(!tt)return;if(!tt.subtasks)tt.subtasks=[];pushUndo();const sid=Date.now();tt.subtasks.push({id:sid,title:'',date:null,done:false,doneAt:null});const taskEl=document.querySelector('.task[data-id="'+taskId+'"]');if(taskEl){const stWrap=taskEl.querySelector('.subtasks-wrap');if(stWrap){stWrap.outerHTML=subtasksHTML(tt,true)}else{const addBtn=taskEl.querySelector('.add-subtask-btn');if(addBtn){const tmp=document.createElement('div');tmp.innerHTML=subtasksHTML(tt,true);addBtn.replaceWith(tmp.firstChild)}}setTimeout(()=>{const dateInput=taskEl.querySelector('.subtask-date[data-sid="'+sid+'"]');if(dateInput){try{dateInput.showPicker()}catch(e){dateInput.focus()}}taskEl.querySelectorAll('.subtask-title').forEach(autoGrow)},100)}save()}
-function setSubtaskDateToday(taskId,sid,btn){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;const st=tt.subtasks.find(s=>s.id===sid);if(!st)return;const now=new Date();const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');st.date=today;const dateInput=btn.previousElementSibling;if(dateInput)dateInput.value=today;save();setTimeout(()=>{const titleInput=document.querySelector('.subtask-title[data-sid="'+sid+'"]');if(titleInput)titleInput.focus()},50)}
-function setSubtaskTitle(taskId,sid,val){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;const st=tt.subtasks.find(s=>s.id===sid);if(st)st.title=val;save()}
-function setSubtaskDate(taskId,sid,val){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;const st=tt.subtasks.find(s=>s.id===sid);if(st)st.date=val||null;save();setTimeout(()=>{const titleInput=document.querySelector('.subtask-title[data-sid="'+sid+'"]');if(titleInput)titleInput.focus()},50)}
-function toggleSubtask(taskId,sid){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;pushUndo();const st=tt.subtasks.find(s=>s.id===sid);if(!st)return;st.done=!st.done;st.doneAt=st.done?Date.now():null;logAction(st.done?'subtaskDone':'subtaskUndone',tt.title+' → '+st.title);render();save();requestAnimationFrame(()=>{document.querySelectorAll('.task[data-id="'+taskId+'"]').forEach(el=>showTaskDetails(el))})}
-function removeSubtask(taskId,sid){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;pushUndo();tt.subtasks=tt.subtasks.filter(s=>s.id!==sid);render();save();requestAnimationFrame(()=>{document.querySelectorAll('.task[data-id="'+taskId+'"]').forEach(el=>showTaskDetails(el))})}
-function subtasksHTML(tt,editable){if(!tt.subtasks||!tt.subtasks.length)return editable?'<button class="add-subtask-btn" onclick="event.stopPropagation();addSubtask('+tt.id+')">'+t('addSubtask')+'</button>':'';if(!editable)return '';let h='<div class="subtasks-wrap">';h+='<button class="add-subtask-btn" onclick="event.stopPropagation();addSubtask('+tt.id+')">'+t('addSubtask')+'</button>';const undone=tt.subtasks.filter(s=>!s.done).slice().reverse();const done=tt.subtasks.filter(s=>s.done);undone.forEach(st=>{const dateVal=st.date||'';h+='<div class="subtask"><div class="subtask-date-row"><input type="checkbox" class="subtask-cb" onchange="toggleSubtask('+tt.id+','+st.id+')"/><input type="date" class="subtask-date" value="'+dateVal+'" onchange="setSubtaskDate('+tt.id+','+st.id+',this.value)" onclick="event.stopPropagation()" data-sid="'+st.id+'"/><button class="subtask-rm" onclick="event.stopPropagation();removeSubtask('+tt.id+','+st.id+')">×</button></div><div class="subtask-title-row-sub"><textarea class="subtask-title" data-sid="'+st.id+'" rows="1" placeholder="…" oninput="autoGrow(this)" onchange="setSubtaskTitle('+tt.id+','+st.id+',this.value)" onclick="event.stopPropagation()">'+esc(st.title)+'</textarea></div></div>'});done.forEach(st=>{h+='<div class="subtask" style="opacity:.5"><div class="subtask-date-row"><input type="checkbox" class="subtask-cb" checked onchange="toggleSubtask('+tt.id+','+st.id+')"/>'+(st.date?'<span class="subtask-date-display">'+st.date+'</span>':'')+'<button class="subtask-rm" onclick="event.stopPropagation();removeSubtask('+tt.id+','+st.id+')">×</button></div><div class="subtask-title-row-sub"><span class="subtask-title strike">'+esc(st.title)+'</span></div></div>'});h+='</div>';return h}
+/* ===== SUBTASKS (Block Architecture) ===== */
+function addSubtaskBlock(taskId){const tt=S.tasks.find(x=>x.id===taskId);if(!tt)return;if(!tt.subtasks)tt.subtasks=[];pushUndo();const now=new Date();const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const bid=Date.now();tt.subtasks.push({id:bid,date:today,waiting:false,items:[{id:bid+1,title:'',done:false,doneAt:null,hasCheckbox:true}]});refreshSubtasksUI(taskId);save();setTimeout(()=>{const titleInput=document.querySelector('.subtask-item-title[data-iid="'+(bid+1)+'"]');if(titleInput)titleInput.focus()},100)}
+function addSubtaskItem(taskId,blockId,hasCheckbox){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;const block=tt.subtasks.find(b=>b.id===blockId);if(!block)return;pushUndo();const iid=Date.now();block.items.push({id:iid,title:'',done:false,doneAt:null,hasCheckbox:hasCheckbox!==false});refreshSubtasksUI(taskId);save();setTimeout(()=>{const titleInput=document.querySelector('.subtask-item-title[data-iid="'+iid+'"]');if(titleInput)titleInput.focus()},100)}
+function removeSubtaskBlock(taskId,blockId){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;pushUndo();tt.subtasks=tt.subtasks.filter(b=>b.id!==blockId);syncTaskWaitingFromSubtasks(taskId);refreshSubtasksUI(taskId);save()}
+function removeSubtaskItem(taskId,blockId,itemId){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;const block=tt.subtasks.find(b=>b.id===blockId);if(!block)return;pushUndo();block.items=block.items.filter(i=>i.id!==itemId);if(!block.items.length){tt.subtasks=tt.subtasks.filter(b=>b.id!==blockId);syncTaskWaitingFromSubtasks(taskId)}refreshSubtasksUI(taskId);save()}
+function setSubtaskBlockDate(taskId,blockId,val){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;const block=tt.subtasks.find(b=>b.id===blockId);if(block)block.date=val||null;save()}
+function toggleSubtaskBlockWaiting(taskId,blockId){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;pushUndo();const block=tt.subtasks.find(b=>b.id===blockId);if(!block)return;block.waiting=!block.waiting;syncTaskWaitingFromSubtasks(taskId);logAction(block.waiting?'blockWait':'blockUnwait',tt.title);render();save();requestAnimationFrame(()=>{document.querySelectorAll('.task[data-id="'+taskId+'"]').forEach(el=>showTaskDetails(el))})}
+function setSubtaskItemTitle(taskId,blockId,itemId,val){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;const block=tt.subtasks.find(b=>b.id===blockId);if(!block)return;const item=block.items.find(i=>i.id===itemId);if(item)item.title=val;save()}
+function toggleSubtaskItem(taskId,blockId,itemId){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;pushUndo();const block=tt.subtasks.find(b=>b.id===blockId);if(!block)return;const item=block.items.find(i=>i.id===itemId);if(!item)return;item.done=!item.done;item.doneAt=item.done?Date.now():null;logAction(item.done?'subtaskDone':'subtaskUndone',tt.title+' → '+item.title);render();save();requestAnimationFrame(()=>{document.querySelectorAll('.task[data-id="'+taskId+'"]').forEach(el=>showTaskDetails(el))})}
+function refreshSubtasksUI(taskId){const taskEls=document.querySelectorAll('.task[data-id="'+taskId+'"]');const tt=S.tasks.find(x=>x.id===taskId);if(!tt)return;taskEls.forEach(taskEl=>{const stWrap=taskEl.querySelector('.subtasks-wrap');const addBtn=taskEl.querySelector('.add-subtask-btn');const newHTML=subtasksHTML(tt,true);if(stWrap){stWrap.outerHTML=newHTML}else if(addBtn){addBtn.outerHTML=newHTML}else{const insertBefore=taskEl.querySelector('.task-row');if(insertBefore){const tmp=document.createElement('div');tmp.innerHTML=newHTML;if(tmp.firstChild)insertBefore.parentNode.insertBefore(tmp.firstChild,insertBefore)}}taskEl.querySelectorAll('.subtask-item-title').forEach(autoGrow)})}
+function setSubtaskBlockDateToday(taskId,blockId,btn){const tt=S.tasks.find(x=>x.id===taskId);if(!tt||!tt.subtasks)return;const block=tt.subtasks.find(b=>b.id===blockId);if(!block)return;const now=new Date();const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');block.date=today;const dateInput=btn.closest('.subtask-block-head').querySelector('.subtask-block-date');if(dateInput)dateInput.value=today;save()}
+function subtasksHTML(tt,editable){
+if(!tt.subtasks||!tt.subtasks.length)return editable?'<div class="subtasks-wrap"><button class="add-subtask-btn" onclick="event.stopPropagation();addSubtaskBlock('+tt.id+')">'+t('addBlock')+'</button></div>':'';
+if(!editable)return '';
+let h='<div class="subtasks-wrap">';
+h+='<button class="add-subtask-btn" onclick="event.stopPropagation();addSubtaskBlock('+tt.id+')" style="margin-bottom:4px">'+t('addBlock')+'</button>';
+tt.subtasks.forEach(block=>{
+const isWait=block.waiting;
+const dateVal=block.date||'';
+h+='<div class="subtask-block'+(isWait?' waiting-block':'')+'" data-bid="'+block.id+'">';
+h+='<div class="subtask-block-head">';
+h+='<input type="date" class="subtask-block-date" value="'+dateVal+'" onchange="setSubtaskBlockDate('+tt.id+','+block.id+',this.value)" onclick="event.stopPropagation()"/>';
+h+='<button class="subtask-today-btn" onclick="event.stopPropagation();setSubtaskBlockDateToday('+tt.id+','+block.id+',this)">'+t('today')+'</button>';
+h+='<button class="subtask-block-wait-btn'+(isWait?' active':'')+'" onclick="event.stopPropagation();toggleSubtaskBlockWaiting('+tt.id+','+block.id+')" title="⏳">⏳</button>';
+h+='<button class="subtask-block-rm" onclick="event.stopPropagation();removeSubtaskBlock('+tt.id+','+block.id+')" title="×">×</button>';
+h+='</div>';
+h+='<div class="subtask-block-body">';
+const undone=block.items.filter(i=>!i.done);
+const done=block.items.filter(i=>i.done);
+undone.forEach(item=>{
+if(item.hasCheckbox!==false){
+h+='<div class="subtask-item"><input type="checkbox" class="subtask-cb" onchange="toggleSubtaskItem('+tt.id+','+block.id+','+item.id+')"/><textarea class="subtask-title subtask-item-title" data-iid="'+item.id+'" rows="1" placeholder="…" oninput="autoGrow(this)" onchange="setSubtaskItemTitle('+tt.id+','+block.id+','+item.id+',this.value)" onclick="event.stopPropagation()">'+esc(item.title)+'</textarea><button class="subtask-rm" onclick="event.stopPropagation();removeSubtaskItem('+tt.id+','+block.id+','+item.id+')">×</button></div>';
+}else{
+h+='<div class="subtask-item subtask-item-note"><textarea class="subtask-title subtask-item-title subtask-item-text" data-iid="'+item.id+'" rows="1" placeholder="📝…" oninput="autoGrow(this)" onchange="setSubtaskItemTitle('+tt.id+','+block.id+','+item.id+',this.value)" onclick="event.stopPropagation()" style="font-style:italic;color:var(--tx2)">'+esc(item.title)+'</textarea><button class="subtask-rm" onclick="event.stopPropagation();removeSubtaskItem('+tt.id+','+block.id+','+item.id+')">×</button></div>';
+}
+});
+done.forEach(item=>{
+h+='<div class="subtask-item" style="opacity:.5"><input type="checkbox" class="subtask-cb" checked onchange="toggleSubtaskItem('+tt.id+','+block.id+','+item.id+')"/><span class="subtask-title strike">'+esc(item.title)+'</span><button class="subtask-rm" onclick="event.stopPropagation();removeSubtaskItem('+tt.id+','+block.id+','+item.id+')">×</button></div>';
+});
+h+='</div>';
+h+='<div class="subtask-block-actions"><button onclick="event.stopPropagation();addSubtaskItem('+tt.id+','+block.id+',true)">'+t('addItem')+'</button><button onclick="event.stopPropagation();addSubtaskItem('+tt.id+','+block.id+',false)">'+t('addItemNote')+'</button></div>';
+h+='</div>';
+});
+h+='</div>';
+return h;
+}
 
 function scrollToFolderTask(id){const container=document.getElementById('foldersContainer');if(!container)return;const el=container.querySelector('.task[data-id="'+id+'"]');if(!el)return;const folder=el.closest('.folder');if(folder){const f=S.folders.find(x=>x.id===parseInt(folder.dataset.folderId));if(f&&f.collapsed){f.collapsed=false;render();setTimeout(()=>scrollToFolderTask(id),100);return}}el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='2px solid var(--accent)';setTimeout(()=>el.style.outline='',1500)}
 
@@ -732,7 +824,7 @@ function toggleDoneOverview(){doneOverviewOpen=!doneOverviewOpen;document.getEle
 function renderDoneOverview(){const panel=document.getElementById('doneOverviewPanel');if(!doneOverviewOpen){panel.classList.remove('open');return}panel.classList.add('open');
 const doneItems=[];
 S.tasks.filter(tt=>tt.done).forEach(tt=>{doneItems.push({type:'task',task:tt,title:tt.title,pc:tt.pc,doneAt:tt.doneAt,folderId:tt.folderId})});
-S.tasks.forEach(tt=>{if(tt.subtasks)tt.subtasks.filter(st=>st.done).forEach(st=>{doneItems.push({type:'subtask',task:tt,title:tt.title,subTitle:st.title,pc:tt.pc,doneAt:st.doneAt,folderId:tt.folderId})})});
+S.tasks.forEach(tt=>{if(tt.subtasks)tt.subtasks.forEach(block=>{if(block.items)block.items.filter(i=>i.done).forEach(i=>{doneItems.push({type:'subtask',task:tt,title:tt.title,subTitle:i.title,pc:tt.pc,doneAt:i.doneAt,folderId:tt.folderId})})})});
 doneItems.sort((a,b)=>(b.doneAt||0)-(a.doneAt||0));
 if(!doneItems.length){panel.innerHTML='<div style="padding:10px;font-size:12px;color:var(--tx2);text-align:center">—</div>';return}
 const dayGroups={};doneItems.forEach(item=>{const d=item.doneAt?new Date(item.doneAt):null;const key=d?d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'):'unknown';if(!dayGroups[key])dayGroups[key]=[];dayGroups[key].push(item)});
@@ -855,7 +947,7 @@ upTL();
 const qaSelect=document.getElementById('quickAddFolder');if(qaSelect){const curVal=qaSelect.value;let opts='';S.folders.forEach(f=>{const icon=f.icon||'📁';opts+='<option value="'+f.id+'">'+icon+' '+esc(f.name)+'</option>'});qaSelect.innerHTML=opts;if(curVal&&S.folders.find(f=>f.id===parseInt(curVal)))qaSelect.value=curVal;else{const lastFab=parseInt(localStorage.getItem('reasons_lastFabFolder'))||0;const lastF=S.folders.find(f=>f.id===lastFab);if(lastF)qaSelect.value=lastF.id;else{const inb=S.folders.find(f=>f.icon==='📥'||f.name==='Inbox');if(inb)qaSelect.value=inb.id}}}
 if(doneOverviewOpen)renderDoneOverview();
 if(logPanelOpen)renderLog();
-document.querySelectorAll('.task-note,.task-title,.folder-desc,.add-task-input,.folder-name,.subtask-title').forEach(autoGrow);
+document.querySelectorAll('.task-note,.task-title,.folder-desc,.add-task-input,.folder-name,.subtask-title,.subtask-item-title').forEach(autoGrow);
 document.querySelectorAll('#nowZone .task, #todayZone .task, #waitZone .task, #foldersContainer .task').forEach(taskEl=>{const id=parseInt(taskEl.dataset.id);if(!id)return;let longPress=null;taskEl.addEventListener('touchstart',function(e){longPress=setTimeout(()=>{onTouchDragStart(e,id)},300)},{passive:false});taskEl.addEventListener('touchmove',function(e){if(longPress){clearTimeout(longPress);longPress=null}if(touchDragId)onTouchDragMove(e)},{passive:false});taskEl.addEventListener('touchend',function(e){if(longPress){clearTimeout(longPress);longPress=null}if(touchDragId)onTouchDragEnd(e)})});
 }
 function autoGrow(el){if(!el)return;el.style.height='auto';el.style.height=Math.max(16,el.scrollHeight)+'px'}
